@@ -58,11 +58,7 @@ action set_nhop(nhop_ipv4, port) {
     modify_field(routing_metadata.nhop_ipv4, nhop_ipv4);
     modify_field(standard_metadata.egress_spec, port);
     modify_field(ipv4.ttl,10);
-    /* add_to_field(ipv4.ttl,1); */
-    add_to_field(ipv4.ttl,queueing_metadata.enq_timestamp);
-    add_to_field(ipv4.ttl,intrinsic_metadata.ingress_global_timestamp);
-    /* modify_field(ipv4.ttl,queueing_metadata.enq_timestamp); */
-    /* modify_field(ipv4.ttl,intrinsic_metadata.ingress_global_timestamp); */
+    add_to_field(ipv4.ttl,queueing_metadata.deq_qdepth);
 }
 
 table ipv4_lpm {

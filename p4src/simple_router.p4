@@ -27,22 +27,7 @@ header_type routing_metadata_t {
     }
 }
 
-metadata routing_metadata_t routing_metadata;
 
-
-header_type intrinsic_metadata_t {
-    fields {
-        mcast_grp : 4;
-        egress_rid : 4;
-        mcast_hash : 16;
-        lf_field_list: 32;
-        ingress_global_timestamp : 64;
-        resubmit_flag : 16;
-        recirculate_flag : 16;
-    }
-}
-
-metadata intrinsic_metadata_t intrinsic_metadata;
 
 header_type queueing_metadata_t {
        fields {
@@ -52,6 +37,8 @@ header_type queueing_metadata_t {
            deq_qdepth : 16;
        }
    }
+
+metadata routing_metadata_t routing_metadata;
   
 metadata queueing_metadata_t queueing_metadata;
 header queueing_metadata_t queueing_hdr;
@@ -73,6 +60,7 @@ table ipv4_lpm {
 }
 
 action set_dmac(dmac) {
+
     modify_field(ethernet.dstAddr, dmac);
 }
 
@@ -89,37 +77,10 @@ table forward {
 
 action rewrite_mac(smac) {
     modify_field(ethernet.srcAddr, smac);
-    modify_field(ipv4.ttl,0);
-    //有
-    /* add_to_field(ipv4.ttl,queueing_metadata.enq_timestamp); */
-    //没
-    add_to_field(ipv4.ttl,queueing_metadata.enq_qdepth);
-    //有
-    /* add_to_field(ipv4.ttl,queueing_metadata.deq_timedelta); */
-    //没
-    /* add_to_field(ipv4.ttl,queueing_metadata.deq_qdepth); */
-    //没
-    /* add_to_field(ipv4.ttl, intrinsic_metadata.mcast_grp); */
-    //没
-    /* add_to_field(ipv4.ttl, intrinsic_metadata.egress_rid); */
-    //没
-    /* add_to_field(ipv4.ttl, intrinsic_metadata.mcast_hash); */
-    //没
-    /* add_to_field(ipv4.ttl, intrinsic_metadata.lf_field_list); */
-    //有
-    /* add_to_field(ipv4.ttl, intrinsic_metadata.ingress_global_timestamp); */
-    //没
-    /* add_to_field(ipv4.ttl, intrinsic_metadata.resubmit_flag); */
-    //没
-    /* add_to_field(ipv4.ttl, intrinsic_metadata.recirculate_flag); */
-
-
-
-    /* add_header(queueing_hdr); */
-    /* modify_field(queueing_hdr.enq_timestamp, queueing_metadata.enq_timestamp); */
-    /* modify_field(queueing_hdr.enq_qdepth, queueing_metadata.enq_qdepth); */
-    /* modify_field(queueing_hdr.deq_timedelta, queueing_metadata.deq_timedelta); */
-    /* modify_field(queueing_hdr.deq_qdepth, queueing_metadata.deq_qdepth); */
+    /* modify_field(ipv4.ttl,queueing_metadata.enq_timestamp); */
+    /* modify_field(ipv4.ttl,queueing_metadata.enq_qdepth); */
+    /* modify_field(ipv4.ttl,queueing_metadata.deq_timedelta); */
+    /* modify_field(ipv4.ttl,queueing_metadata.deq_qdepth); */
 
 }
 

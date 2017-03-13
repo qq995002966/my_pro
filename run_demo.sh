@@ -9,8 +9,9 @@ ROUTER_PATH=$BMV2_PATH/targets/simple_router/simple_router
 
 CLI_PATH=$BMV2_PATH/tools/runtime_CLI.py
 $P4C_BM_SCRIPT p4src/simple_router.p4 --json simple_router.json
+# $P4C_BM_SCRIPT p4src/testQueue/queueing.p4 --json simple_router.json
 
 sudo python $BMV2_PATH/mininet/1sw_demo.py \
-      --behavioral-exe $ROUTER_PATH \
+      --behavioral-exe $SWITCH_PATH \
       --json simple_router.json
 

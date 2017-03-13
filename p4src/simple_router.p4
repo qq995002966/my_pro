@@ -100,7 +100,7 @@ control ingress {
     apply(forward);
 }
 
-control egress {//这个egress是在哪里起作用的呀?这难道也是关键字么?
+control egress {
     apply(send_frame);
 }
 

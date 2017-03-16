@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-#created by John 2017/3/16
+# created by John 2017/3/16
 
 from mininet.net import Mininet
 from mininet.topo import Topo
@@ -30,66 +30,59 @@ args = parser.parse_args()
 
 class figure4Topo(Topo):
     "figure4Toto with 10 host on the left connected to a simpe_switch(p4) "
-    def __init__(self,sw_path)
 
-
-class SingleSwitchTopo(Topo):
-    "Single switch connected to n (< 256) hosts."
-    def __init__(self, sw_path, json_path, thrift_port, pcap_dump, n, **opts):
-        # Initialize topology and default options
+    def __init__(self, sw_path, json_path, thrift_port, pcap_dump, sender_count, **opts):
         Topo.__init__(self, **opts)
 
-        switch = self.addSwitch('s1',
-                                sw_path = sw_path,
-                                json_path = json_path,
-                                thrift_port = thrift_port,
-                                pcap_dump = pcap_dump)
+        #this is left switch
+        switch = self.addSwitch('switchLeft',
+                                    sw_path=sw_path,
+                                    json_path=json_path,
+                                    thrift_port=thrift_port,
+                                    pcap_dump=pcap_dump)
+        #this is right switch
 
-        for h in xrange(n):
-            host = self.addHost('h%d' % (h + 1),
-                                ip = "10.0.%d.10/24" % h,
-                                mac = '00:04:00:00:00:%02x' %h)
-            self.addLink(host, switch)
+        #this is receiver
+        receiver = self.addHost('receiver')
+        # sender_count senders
+        senders=[]
+        for h in xrange(sender_count):
+            senders.append(self.addHost('sender%d' % (h+1)))
+
+        #
+        self.addLink(receiver,switch)
+
+        for i in range(n-1)
+            self.addLink(senders[i],switch)
+
+
 
 def main():
-    num_hosts = args.num_hosts
-    mode = args.mode
 
-    topo = SingleSwitchTopo(args.behavioral_exe,
+    topo = figure4Topo(args.behavioral_exe,
                             args.json,
                             args.thrift_port,
                             args.pcap_dump,
-                            num_hosts)
-    net = Mininet(topo = topo,
-                  host = P4Host,
-                  switch = P4Switch,
-                  controller = None)
+                            10)
+    net = Mininet(topo=topo,
+                  host=P4Host,
+                  switch=P4Switch,
+                  controller=None)
     net.start()
 
 
-    sw_mac = ["00:aa:bb:00:00:%02x" % n for n in xrange(num_hosts)]
-
-    sw_addr = ["10.0.%d.1" % n for n in xrange(num_hosts)]
-
-    for n in xrange(num_hosts):
-        h = net.get('h%d' % (n + 1))
-        if mode == "l2":
-            h.setDefaultRoute("dev eth0")
-        else:
-            h.setARP(sw_addr[n], sw_mac[n])
-            h.setDefaultRoute("dev eth0 via %s" % sw_addr[n])
-
-    for n in xrange(num_hosts):
-        h = net.get('h%d' % (n + 1))
+    for n in xrange(10):
+        h = net.get('sender%d' % (n + 1))
         h.describe()
 
     sleep(1)
 
     print "Ready !"
 
-    CLI( net )
+    CLI(net)
     net.stop()
 
+
 if __name__ == '__main__':
-    setLogLevel( 'info' )
+    setLogLevel('info')
     main()

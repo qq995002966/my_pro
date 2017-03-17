@@ -4,8 +4,8 @@
 
 from mininet.net import Mininet
 from mininet.topo import Topo
-from mininet.log import setLogLevel, info
 from mininet.cli import CLI
+from mininet.log import setLogLevel
 
 from p4_mininet import P4Switch, P4Host
 
@@ -35,7 +35,7 @@ class figure4Topo(Topo):
         Topo.__init__(self, **opts)
 
         #this is left switch
-        switch = self.addSwitch('switchLeft',
+        switch = self.addSwitch('s1',
                                     sw_path=sw_path,
                                     json_path=json_path,
                                     thrift_port=thrift_port,
@@ -43,18 +43,18 @@ class figure4Topo(Topo):
         #this is right switch
 
         #this is receiver
-        receiver = self.addHost('receiver')
         # sender_count senders
         senders=[]
         for h in xrange(sender_count):
             senders.append(self.addHost('sender%d' % (h+1)))
 
+        receiver = self.addHost('receiver')
         #
+
+        for h in xrange(sender_count):
+            self.addLink(senders[h],switch)
+
         self.addLink(receiver,switch)
-
-        for i in range(n-1)
-            self.addLink(senders[i],switch)
-
 
 
 def main():
@@ -67,7 +67,7 @@ def main():
     net = Mininet(topo=topo,
                   host=P4Host,
                   switch=P4Switch,
-                  controller=None)
+                  )
     net.start()
 
 

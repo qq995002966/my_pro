@@ -46,9 +46,11 @@ class figure4Topo(Topo):
         # sender_count senders
         senders=[]
         for h in xrange(sender_count):
-            senders.append(self.addHost('sender%d' % (h+1)))
+            senders.append(self.addHost('sender%d' % h ,
+                                        ip="10.0.0.1%d/24" % h))
 
-        receiver = self.addHost('receiver')
+        receiver = self.addHost('receiver',
+                                ip="10.0.1.10/24")
         #
 
         for h in xrange(sender_count):

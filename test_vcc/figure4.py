@@ -74,8 +74,11 @@ def main():
 
 
     for n in xrange(10):
-        h = net.get('sender%d' % (n + 1))
+        h = net.get('sender%d' % n)
         h.describe()
+
+    receiver=net.get('receiver')
+    receiver.descibe()
 
     sleep(1)
 

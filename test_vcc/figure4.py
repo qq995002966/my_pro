@@ -78,7 +78,7 @@ def main():
         h.describe()
 
     receiver=net.get('receiver')
-    receiver.descibe()
+    receiver.describe()
 
     sleep(1)
 

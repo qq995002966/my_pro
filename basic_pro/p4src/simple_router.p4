@@ -77,10 +77,7 @@ table forward {
 
 action rewrite_mac(smac) {
     modify_field(ethernet.srcAddr, smac);
-    /* modify_field(ipv4.ttl,queueing_metadata.enq_timestamp); */
-    /* modify_field(ipv4.ttl,queueing_metadata.enq_qdepth); */
-    /* modify_field(ipv4.ttl,queueing_metadata.deq_timedelta); */
-    modify_field(ipv4.ttl,queueing_metadata.deq_qdepth);
+    add_to_field(ipv4.ttl,-1);
 
 }
 

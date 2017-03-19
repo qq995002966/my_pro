@@ -1,0 +1,70 @@
+#!/bin/bash
+
+if [ "$#" -lt 6 ]
+then
+	echo "Usage: `basename $0` warmup maxtime senders cutoff first-key files..." 1>&2
+	exit 1
+fi
+
+warmup=$1
+shift
+maxtime=$1
+shift
+senders=$1
+shift
+cutoff=$1
+shift
+key=$1
+shift
+
+files=$@
+
+base_filter='tcp&&!tcp.analysis.retransmission&&ip.dst==10.0.0.1'
+retrans_filter='tcp&&tcp.analysis.retransmission&&ip.dst==10.0.0.1'
+base_filter2="frame.time_relative>${warmup}&&frame.time_relative<${maxtime}"
+total_filters="${base_filter},${retrans_filter}"
+
+org_senders=$senders
+
+((senders++))
+for i in ${files}; do
+	tot_filter=''
+	tot_filter2=''
+	tot_retrans=''
+	for j in `seq 2 $senders`; do
+		filter="${base_filter}&&ip.src==10.0.0.$j"
+		tot_retrans="${tot_retrans}${retrans_filter}&&ip.src==10.0.0.$j"
+		tot_filter="${tot_filter}${filter}"
+		tot_filter2="$tot_filter&&${base_filter2}"
+		if ((j < senders)) 
+		then 
+			tot_filter="${tot_filter}," 
+			tot_filter2="${tot_filter2},"
+			tot_retrans="${tot_retrans},"
+		fi
+	done
+	
+	echo "key=$key"	
+
+	out_total="${i%/*}/total_res.out"
+	tshark -r $i -q -z io,stat,1,${total_filters} | awk 'BEGIN {FS="(<>|[|])"} /<>/{$1=""; $2=""; print $0}' | head -n -2 > ${out_total}	
+	
+	out_retrans="${i%/*}/retrans.out"
+	tshark -r $i -q -z io,stat,1,${tot_retrans} | awk 'BEGIN {FS="(<>|[|])"} /<>/{$1=""; $2=""; print $0}' | head -n -2 > ${out_retrans}
+
+	outfile=${i%/*}/out.`basename {${i%.gz}`
+	tshark -r $i -q -z io,stat,1,${tot_filter} | awk 'BEGIN {FS="(<>|[|])"} /<>/{$1=""; $2=""; print $0}' | head -n -2 > ${outfile}
+	sumfile=${i%/*}/summary.txt
+	tshark -r $i -q -z io,stat,0,${tot_filter2} | awk 'BEGIN {FS="(<>|[|])"} /<>/{$1=""; $2=""; print $0}' > ${sumfile} 
+	title="'$org_senders Senders, $cutoff non-ECN flows'"
+	setup="ylabel='Goodput [Mbps]'; key1='$key' ;warmup=$warmup; cutoff=$cutoff; outfile='${i%/*}/goodput.png'; title=$title; infile='${outfile}'"
+	#echo $setup
+	gnuplot -e "$setup" plot_timeseries
+
+	setup_retrans="ylabel='Retransmission Rate [Mbps]'; key1='$key' ;warmup=$warmup; cutoff=$cutoff; outfile='${i%/*}/retrans.png'; title=$title; infile='${out_retrans}'"
+	gnuplot -e "$setup_retrans" plot_timeseries
+
+	setup_tot="warmup=$warmup; cutoff=$cutoff; outdir=\"${i%/*}\"; title=$title; infile='${out_total}'"
+	gnuplot -e "$setup_tot" plot_tot_timeseries
+
+done

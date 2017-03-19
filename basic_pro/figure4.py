@@ -73,26 +73,28 @@ class Figure4Topo(Topo):
                             'enable_ecn': 1 if self.enable_ecn else 0,
                             'enable_red': 1 if self.enable_red else 0,
                             'red_params': self.red_params if ( (self.enable_red )
-						and self.red_params != None) else None,
+                            and self.red_params != None) else None,
                             'show_commands': self.show_mininet_commands}
 
         n = self.n
         # Create the receiver
         receiver = self.addHost('h0',
-                                ip="10.0.1.10/24",
-                                mac='00:04:00:00:01:00')
+                                mac='00:04:00:00:00:01')
         #crate a switch
         sw_path=" /home/mininet/documents/p4lang/behavioral-model/targets/simple_switch/simple_switch"
         json_path="simple_router.json"
         switch = self.addSwitch('s0',
                                 sw_path=sw_path,
-                                json_path=json_path)
+                                json_path=json_path,
+                                thrift_port=9090,
+                                pcap_dump=False
+                                )
+
         #create the sender hosts
         hosts = []
         for h in range(n-1):
             hosts.append(self.addHost('h%d' % (h+1),
-                                    ip="10.0.0.1%d/24" % h,
-                                    mac='00:04:00:00:00:%02x' %h,
+                                    mac='00:04:00:00:00:%02x' %(h+2),
                                     **hconfig))
 
 

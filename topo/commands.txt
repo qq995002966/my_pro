@@ -1,26 +1,26 @@
-table_add forward set_dmac 10.0.0.10 => 00:04:00:00:00:00
-table_add forward set_dmac 10.0.0.11 => 00:04:00:00:00:01
-table_add forward set_dmac 10.0.0.12 => 00:04:00:00:00:02
-table_add forward set_dmac 10.0.0.13 => 00:04:00:00:00:03
-table_add forward set_dmac 10.0.0.14 => 00:04:00:00:00:04
-table_add forward set_dmac 10.0.0.15 => 00:04:00:00:00:05
-table_add forward set_dmac 10.0.0.16 => 00:04:00:00:00:06
-table_add forward set_dmac 10.0.0.17 => 00:04:00:00:00:07
-table_add forward set_dmac 10.0.0.18 => 00:04:00:00:00:08
-table_add forward set_dmac 10.0.0.19 => 00:04:00:00:00:09
+table_add forward set_dmac 10.0.0.1 => 00:04:00:00:00:01
 
-table_add forward set_dmac 10.0.1.10 => 00:04:00:00:01:00
+table_add forward set_dmac 10.0.0.2 => 00:04:00:00:00:02
+table_add forward set_dmac 10.0.0.3 => 00:04:00:00:00:03
+table_add forward set_dmac 10.0.0.4 => 00:04:00:00:00:04
+table_add forward set_dmac 10.0.0.5 => 00:04:00:00:00:05
+table_add forward set_dmac 10.0.0.6 => 00:04:00:00:00:06
+table_add forward set_dmac 10.0.0.7 => 00:04:00:00:00:07
+table_add forward set_dmac 10.0.0.8 => 00:04:00:00:00:08
+table_add forward set_dmac 10.0.0.9 => 00:04:00:00:00:09
+table_add forward set_dmac 10.0.0.10 => 00:04:00:00:00:0a
+table_add forward set_dmac 10.0.0.11 => 00:04:00:00:00:0b
 
-table_add ipv4_lpm set_nhop 10.0.1.10/32 => 10.0.1.10 1
+table_add ipv4_lpm set_nhop 10.0.0.1/32 => 10.0.0.1 1
 
-table_add ipv4_lpm set_nhop 10.0.0.10/32 => 10.0.0.10 2
-table_add ipv4_lpm set_nhop 10.0.0.11/32 => 10.0.0.11 3
-table_add ipv4_lpm set_nhop 10.0.0.12/32 => 10.0.0.12 4
-table_add ipv4_lpm set_nhop 10.0.0.13/32 => 10.0.0.13 5
-table_add ipv4_lpm set_nhop 10.0.0.14/32 => 10.0.0.14 6
-table_add ipv4_lpm set_nhop 10.0.0.15/32 => 10.0.0.15 7
-table_add ipv4_lpm set_nhop 10.0.0.16/32 => 10.0.0.16 8
-table_add ipv4_lpm set_nhop 10.0.0.17/32 => 10.0.0.17 9
-table_add ipv4_lpm set_nhop 10.0.0.18/32 => 10.0.0.18 10
-table_add ipv4_lpm set_nhop 10.0.0.19/32 => 10.0.0.19 11
+table_add ipv4_lpm set_nhop 10.0.0.2/32 => 10.0.0.2 2
+table_add ipv4_lpm set_nhop 10.0.0.3/32 => 10.0.0.3 3
+table_add ipv4_lpm set_nhop 10.0.0.4/32 => 10.0.0.4 4
+table_add ipv4_lpm set_nhop 10.0.0.5/32 => 10.0.0.5 5
+table_add ipv4_lpm set_nhop 10.0.0.6/32 => 10.0.0.4 6
+table_add ipv4_lpm set_nhop 10.0.0.7/32 => 10.0.0.5 7
+table_add ipv4_lpm set_nhop 10.0.0.8/32 => 10.0.0.6 8
+table_add ipv4_lpm set_nhop 10.0.0.9/32 => 10.0.0.7 9
+table_add ipv4_lpm set_nhop 10.0.0.10/32 => 10.0.0.8 10
+table_add ipv4_lpm set_nhop 10.0.0.11/32 => 10.0.0.9 11
 

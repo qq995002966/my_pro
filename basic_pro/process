@@ -48,6 +48,7 @@ for i in ${files}; do
 
 	out_total="${i%/*}/total_res.out"
 	tshark -r $i -q -z io,stat,1,${total_filters} | awk 'BEGIN {FS="(<>|[|])"} /<>/{$1=""; $2=""; print $0}' | head -n -2 > ${out_total}	
+
 	
 	out_retrans="${i%/*}/retrans.out"
 	tshark -r $i -q -z io,stat,1,${tot_retrans} | awk 'BEGIN {FS="(<>|[|])"} /<>/{$1=""; $2=""; print $0}' | head -n -2 > ${out_retrans}

@@ -1,0 +1,18 @@
+set style line 1 lt 1 lc rgb '#000000' lw 2.5 pt 5 ps 1.5 # blue
+set style line 2 lt 3 lc rgb '#979797' lw 2.5 pt 6 ps 1.5 # orange
+set style line 3 lt 2 lc rgb '#a4a4a4' lw 2.5 pt 7 ps 1.5 # orange
+set style line 4 lt 4 lc rgb 'red' lw 2.5 pt 7 ps 1.5 
+#set key top right
+set key above
+set xlabel "Number of ECN flows"
+set ylabel 'non-ECN / ECN Goodput Ratio'
+#set title title
+unset title
+set grid
+set terminal pngcairo enhanced dashed font 'Verdana,16'
+#set terminal wxt dashed
+set output outfile
+set yrange [:1.1]
+#set xrange [:600]
+plot for [i=1:words(files)] word(files,i) using (10-$1):(1/$2) with linespoints ls i title word(keys,i),\
+ 1.0 with lines ls 4 title ""

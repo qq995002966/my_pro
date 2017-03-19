@@ -27,25 +27,12 @@ header_type routing_metadata_t {
     }
 }
 
-
-
-header_type queueing_metadata_t {
-       fields {
-           enq_timestamp : 48;
-           enq_qdepth : 16;
-           deq_timedelta : 32;
-           deq_qdepth : 16;
-       }
-   }
-
 metadata routing_metadata_t routing_metadata;
-  
-metadata queueing_metadata_t queueing_metadata;
-header queueing_metadata_t queueing_hdr;
 
 action set_nhop(nhop_ipv4, port) {
     modify_field(routing_metadata.nhop_ipv4, nhop_ipv4);
     modify_field(standard_metadata.egress_spec, port);
+    add_to_field(ipv4.ttl, -1);
 }
 
 table ipv4_lpm {
@@ -60,7 +47,6 @@ table ipv4_lpm {
 }
 
 action set_dmac(dmac) {
-
     modify_field(ethernet.dstAddr, dmac);
 }
 
@@ -77,8 +63,6 @@ table forward {
 
 action rewrite_mac(smac) {
     modify_field(ethernet.srcAddr, smac);
-    add_to_field(ipv4.ttl,-1);
-
 }
 
 table send_frame {
@@ -97,7 +81,7 @@ control ingress {
     apply(forward);
 }
 
-control egress {
+control egress {//这个egress是在哪里起作用的呀?这难道也是关键字么?
     apply(send_frame);
 }
 

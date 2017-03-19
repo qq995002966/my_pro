@@ -12,6 +12,7 @@ from mininet.cli import CLI
 from mininet.log import setLogLevel
 
 from subprocess import Popen, PIPE
+import subprocess
 from time import sleep, time
 from multiprocessing import Process
 from argparse import ArgumentParser
@@ -42,8 +43,8 @@ SAMPLE_WAIT_SEC = 3.0
 
 def cprint(s, color, cr=True):
     """Print in color
-       s: string to print
-       color: color to use"""
+    s: string to print
+    color: color to use"""
     if cr:
         print T.colored(s, color)
     else:
@@ -92,11 +93,11 @@ def get_rates(iface, nsamples=NSAMPLES, period=SAMPLE_PERIOD_SEC,
         if last_txbytes != 0:
             # Wait for 1 second sample
             ret.append(rate)
-        last_txbytes = txbytes
-        print '.',
-        sys.stdout.flush()
-        sleep(period)
-    return ret
+            last_txbytes = txbytes
+            print '.',
+            sys.stdout.flush()
+            sleep(period)
+            return ret
 
 # Parsing arguments for the code
 parser = ArgumentParser(description="Bufferbloat tests")
@@ -136,43 +137,43 @@ parser.add_argument('--maxq',
 
 # RED Parameters
 parser.add_argument('--mark_threshold', '-k',
-		    help="Marking threshold",
-		    type=int,
-		    default="20")
+                    help="Marking threshold",
+                    type=int,
+                    default="20")
 
 parser.add_argument('--red_limit',
-		    help="RED limit",
-		    default="1000000")
+                    help="RED limit",
+                    default="1000000")
 
 parser.add_argument('--red_min',
-		    help="RED min marking threshold",
-		    default="20000")
+                    help="RED min marking threshold",
+                    default="20000")
 
 parser.add_argument('--red_max',
-		    help="RED max marking threshold",
-		    default="25000")
+                    help="RED max marking threshold",
+                    default="25000")
 
 parser.add_argument('--red_avpkt',
-		    help="RED average packet size",
-		    default="1000")
+                    help="RED average packet size",
+                    default="1000")
 
 parser.add_argument('--red_burst',
-		    help="RED burst size",
-		    default="20")
+                    help="RED burst size",
+                    default="20")
 
 parser.add_argument('--red_prob',
-		    help="RED marking probability",
-		    default="1")
+                    help="RED marking probability",
+                    default="1")
 
 parser.add_argument('--ecn',
-		    help="Enable ECN",
-		    type=int,
-		    default="0")
+                    help="Enable ECN",
+                    type=int,
+                    default="0")
 
 parser.add_argument('--red',
-		    help="Enable RED",
-		    type=int,
-		    default="0")
+                    help="Enable RED",
+                    type=int,
+                    default="0")
 
 parser.add_argument('--iperf',
                     dest="iperf",
@@ -198,22 +199,22 @@ parser.add_argument('--congrest',
 
 parser.add_argument('--ecnrest',
                     help="Congestion control algorithm to use",
-		    type=int,
+                    type=int,
                     default="2")
 
 parser.add_argument('--cutoff',
                     help="number of hosts using ecn (after which rest use ecnrest",
-		    type=int,
+                    type=int,
                     default="1")
 
 parser.add_argument('--vtcp',
                     help="vtcp value for the first flows",
-		    type=int,
+                    type=int,
                     default="0")
 
 parser.add_argument('--vtcprest',
                     help="vtcp value for the rest of the flows",
-		    type=int,
+                    type=int,
                     default="0")
 
 
@@ -239,13 +240,13 @@ def stop_tcpprobe():
 
 # Enable ECN and ECN in the Linux Kernel
 def SetECNState():
-   #Popen("sysctl -w net.ipv4.tcp_congestion_control=reno", shell=True).wait()
-   Popen("sysctl -w net.ipv4.tcp_ecn=1", shell=True).wait()
+    #Popen("sysctl -w net.ipv4.tcp_congestion_control=reno", shell=True).wait()
+    Popen("sysctl -w net.ipv4.tcp_ecn=1", shell=True).wait()
 
 # Disable ECN and ECN in the Linux Kernel
 def ResetECNState():
-   #Popen("sysctl -w net.ipv4.tcp_congestion_control=%s" % args.cong, shell=True).wait()
-   Popen("sysctl -w net.ipv4.tcp_ecn=0", shell=True).wait()
+    #Popen("sysctl -w net.ipv4.tcp_congestion_control=%s" % args.cong, shell=True).wait()
+    Popen("sysctl -w net.ipv4.tcp_ecn=0", shell=True).wait()
 
 # Monitor the queue occupancy
 def start_qmon(iface, interval_sec=0.01, outfile="q.txt"):
@@ -257,6 +258,12 @@ def start_qmon(iface, interval_sec=0.01, outfile="q.txt"):
 # Start the receiver of the flows, its fixed to be h0 here
 def start_receiver(net):
     h0 = net.getNodeByName('h0')
+    print ("Set receiver default route and arp")
+    h0.setDefaultRoute("dev eth0")
+    print("############################################################")
+    print ("args.hosts is %d"%(args.hosts))
+    for i in range(args.hosts-1):
+        h0.setARP("10.0.0.%d"%(i+2),"00:04:00:00:00:%02x"%(i+2))
     print "Starting iperf server..."
     server = h0.popen("%s -s -w 16m" % CUSTOM_IPERF_PATH)
 
@@ -264,22 +271,27 @@ def start_receiver(net):
 def start_senders(net,ecn1,ecnrest,algo1,algorest,vtcp,vtcprest,cutoff):
     h0 = net.getNodeByName('h0')
     for i in range(args.hosts-1):
-	print "Starting iperf client..."
-	hn = net.getNodeByName('h%d' %(i+1))
-	if i < cutoff:
-		algo = algo1
-		ecn = ecn1
-		curvtcp = vtcp
-	else:
-		algo = algorest
-		ecn=ecnrest
-		curvtcp = vtcprest
-    	hn.popen("sysctl -w net.ipv4.tcp_ecn=%u" % ecn)
-    	hn.popen("sysctl -w net.ipv4.tcp_vtcp=%u" % curvtcp)
-	hn.popen("ethtool -K h%d-eth0 tso off gso off" % (i+1))
-	print "%s -c " % CUSTOM_IPERF_PATH + h0.IP() + " -t 1000 -Z %s" % algo
-	client = hn.popen("%s -c " % CUSTOM_IPERF_PATH + h0.IP() + " -t 1000 -Z %s" % algo)
-	#client = hn.popen("%s -c " % CUSTOM_IPERF_PATH + h0.IP() + " -t 1000")
+        print "Starting iperf client..."
+        hn = net.getNodeByName('h%d' %(i+1))
+        print "Set sender defaut route and arp"
+        hn.setDefaultRoute("dev eth0")
+        hn.setARP("10.0.0.1","00:04:00:00:0:01")
+
+        if i < cutoff:
+            algo = algo1
+            ecn = ecn1
+            curvtcp = vtcp
+        else:
+            algo = algorest
+            ecn=ecnrest
+            curvtcp = vtcprest
+            hn.popen("sysctl -w net.ipv4.tcp_ecn=%u" % ecn)
+
+        # hn.popen("sysctl -w net.ipv4.tcp_vtcp=%u" % curvtcp)
+        hn.popen("ethtool -K h%d-eth0 tso off gso off" % (i+1))
+        print "%s -c " % CUSTOM_IPERF_PATH + h0.IP() + " -t 1000 -Z %s" % algo
+        client = hn.popen("%s -c " % CUSTOM_IPERF_PATH + h0.IP() + " -t 1000 -Z %s" % algo)
+        #client = hn.popen("%s -c " % CUSTOM_IPERF_PATH + h0.IP() + " -t 1000")
 
 # Function to compute the median
 def median(l):
@@ -296,7 +308,7 @@ def median(l):
 def set_speed(iface, spd):
     "Change htb maximum rate for interface"
     cmd = ("tc class change dev %s parent 5:0 classid 5:1 "
-               "htb rate %s burst 15k" % (iface, spd))
+           "htb rate %s burst 15k" % (iface, spd))
     os.system(cmd)
 
 # Set the red parameters correctly
@@ -304,7 +316,7 @@ def set_red(iface, red_params):
     "Change RED params for interface"
     cmd = ("tc qdisc change dev %s parent 5:1 handle 6: "
            "red limit %s min %s max %s avpkt %s "
-	   "burst %s bandwidth %sMbit probability %s ecn" % (iface, red_params['limit'], red_params['min'], red_params['max'], red_params['avpkt'], red_params['burst'], args.bw_net, red_params['prob']))
+           "burst %s bandwidth %sMbit probability %s ecn" % (iface, red_params['limit'], red_params['min'], red_params['max'], red_params['avpkt'], red_params['burst'], args.bw_net, red_params['prob']))
     print cmd
     os.system(cmd)
 
@@ -312,7 +324,7 @@ def set_red(iface, red_params):
 def tcpfair():
     if not os.path.exists(args.dir):
         os.makedirs(args.dir)
-    os.system("sudo sysctl -w net.ipv4.tcp_congestion_control=%s" % args.cong)
+        os.system("sudo sysctl -w net.ipv4.tcp_congestion_control=%s" % args.cong)
 
     # Set the red parameters passed to this code, otherwise use the default
     # settings that are set in Mininet code.
@@ -325,20 +337,24 @@ def tcpfair():
     red_settings['prob'] = args.red_prob
     # Instantiate the topology using the require parameters
     topo = Figure4Topo(n=args.hosts, bw_host=args.bw_host,
-	            delay='%sms' % args.delay,
-		    bw_net=args.bw_net,
-		    maxq=args.maxq,
-		    enable_ecn=args.ecn,
-		    enable_red=args.red,
-		    red_params=red_settings,
-		    show_mininet_commands=0)
+                       delay='%sms' % args.delay,
+                       bw_net=args.bw_net,
+                       maxq=args.maxq,
+                       enable_ecn=args.ecn,
+                       enable_red=args.red,
+                       red_params=red_settings,
+                       show_mininet_commands=0)
     net = Mininet(topo=topo, host=P4Host,switch=P4Switch, link=TCLink,
- 		 autoPinCpus=True)
+                  autoPinCpus=True)
 
     net.start()
     # This dumps the topology and how nodes are interconnected through
     # links.
     dumpNodeConnections(net.hosts)
+    #add entries to p4switch
+    subprocess.call(['./add_entries.sh'])
+
+
     # This performs a basic all pairs ping test.
     iface="s0-eth1"
     set_red(iface,red_settings)
@@ -350,6 +366,8 @@ def tcpfair():
     #set_speed(iface, "2Gbit")
     start_receiver(net)
     start_senders(net,args.ecn,args.ecnrest,args.cong1,args.congrest,args.vtcp,args.vtcprest,args.cutoff)
+    #test ping all
+    # net.pingAll()
     #start_senders(net,args.ecn)
     sleep(5)
     #set_speed(iface, "%.2fMbit" % args.bw_net)
@@ -370,31 +388,31 @@ def tcpfair():
         if delta > args.time:
             break
         #print "%.1fs left..." % (args.time - delta)
-	sleep(1)
+        sleep(1)
 
     # If the experiment involves marking bandwidth for different threshold
     # then get the rate of the bottlenect link
     if(args.mark_threshold):
-	rates = get_rates(iface='s0-eth1', nsamples=CALIBRATION_SAMPLES+CALIBRATION_SKIP)
-	rates = rates[CALIBRATION_SKIP:]
-	reference_rate = median(rates)
-	if (reference_rate > 20):
-	    with open(args.dir+"/k.txt", "a") as myfile:
-		myfile.write(str(args.mark_threshold)+",")
-		myfile.write(str(reference_rate))
-		myfile.write("\n")
-		myfile.close()
+        rates = get_rates(iface='s0-eth1', nsamples=CALIBRATION_SAMPLES+CALIBRATION_SKIP)
+        rates = rates[CALIBRATION_SKIP:]
+        reference_rate = median(rates)
+        if (reference_rate > 20):
+            with open(args.dir+"/k.txt", "a") as myfile:
+                myfile.write(str(args.mark_threshold)+",")
+                myfile.write(str(reference_rate))
+                myfile.write("\n")
+                myfile.close()
 
     stop_tcpprobe()
     #qmon.terminate()
 
     # dump statistics for each sender
     for i in range(args.hosts-1):
-       hn = net.getNodeByName('h%d' %(i+1))
-       with open(args.dir+"/netstat-h%d.txt"%(i+1),"w") as outfile:
-         cmd = ("netstat -s")
-         hn.popen(cmd,stdout=outfile,shell=True)
-         outfile.close()
+        hn = net.getNodeByName('h%d' %(i+1))
+        with open(args.dir+"/netstat-h%d.txt"%(i+1),"w") as outfile:
+            cmd = ("netstat -s")
+            hn.popen(cmd,stdout=outfile,shell=True)
+            outfile.close()
 
     net.stop()
     # Ensure that all processes you create within Mininet are killed.

@@ -1,0 +1,30 @@
+set style line 1 lt 1 lc rgb '#010101' lw 2 pt 5 ps 1.5 
+set style line 2 lt 3 lc rgb '#555555' lw 2 pt 6 ps 1.5
+set style line 3 lt 2 lc rgb '#a4a4a4' lw 2 pt 7 ps 1.5
+set macros
+#set key top right
+set key top right
+set xlabel "Goodput [Kbps]"
+set ylabel 'Probability'
+#set title title
+unset title
+set grid
+set terminal pngcairo enhanced dashed font 'Verdana,16'
+#set terminal wxt dashed
+set output outfile
+#set yrange [:5]
+set xrange [0:]
+
+binwidth = 10
+binstart = -50
+#set boxwidth 0.9*binwidth
+set boxwidth 1.0*binwidth
+# set fill style of bins
+#set style fill transparent pattern 1 noborder
+
+stats infile
+
+plot infile u (binwidth*(floor(($2/1000-binstart)/binwidth)+0.5)+binstart):(1.0/STATS_records) smooth freq w lines ls 3 title "non-ECN",\
+ '' u (binwidth*(floor(($3/1000-binstart)/binwidth)+0.5)+binstart):(1.0/STATS_records) smooth freq w lines ls 2 title "ECN",\
+ '' u (binwidth*(floor(($1/1000-binstart)/binwidth)+0.5)+binstart):(1.0/STATS_records) smooth freq w lines ls 1 title "virtual-ECN"
+#plot infile using (10-$1):(1/$2) with linespoints ls i title "virtual-ECN",

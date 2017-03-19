@@ -13,6 +13,7 @@ from p4_mininet import P4Switch, P4Host
 
 import argparse
 from time import sleep
+import subprocess
 
 parser = argparse.ArgumentParser(description='Mininet demo')
 parser.add_argument('--behavioral-exe', help='Path to behavioral executable',
@@ -46,31 +47,28 @@ class figure4Topo(Topo):
                                 json_path=json_path,
                                 thrift_port=thrift_port,
                                 pcap_dump=pcap_dump)
-        #this is right switch
-
         #this is receiver
+        receiver = self.addHost(receiver_name,
+                                mac='00:04:00:00:00:01')
+        self.addLink(receiver, switch)
+
         # sender_count senders
         senders=[]
         for h in range(sender_count):
-            senders.append(self.addHost(senders_sub_name+'%d' % h ,
-                                        ip="10.0.0.1%d/24" % h,
-                                        mac='00:04:00:00:00:%02x' %h))
+            senders.append(self.addHost(senders_sub_name+'%d' % (h+1) ,
+                                        mac='00:04:00:00:00:%02x' %(h+2)))
 #
         for h in range(sender_count):
             self.addLink(senders[h],switch)
 #set all senders ecn enable (tcp_ecn = 1)
 
-        receiver = self.addHost(receiver_name,
-                                ip="10.0.1.10/24",
-                                mac='00:04:00:00:01:00')
 
-        self.addLink(receiver, switch)
         #
 
 def enable_senders_ecn(net,sender_count,senders_sub_name,receiver_name):
 #set all senders ecn enabled , just for test
     for i in range(sender_count):
-        hn=net.getNodeByName(senders_sub_name+'%d' % i )
+        hn=net.getNodeByName(senders_sub_name+'%d' % (i+1))
         hn.popen("sysctl -w net.ipv4.tcp_ecn=1")
 
     receiver=net.getNodeByName(receiver_name)
@@ -80,21 +78,21 @@ def enable_senders_ecn(net,sender_count,senders_sub_name,receiver_name):
 def set_hosts_default_route_and_arp(net,sender_count,
                                     senders_sub_name,receiver_name):
     for i in range(sender_count):
-        sender=net.getNodeByName(senders_sub_name+'%d' % i )
+        sender=net.getNodeByName(senders_sub_name+'%d' % (i+1) )
         sender.setDefaultRoute("dev eth0")
-        sender.setARP("10.0.1.10","00:04:00:00:01:00")
+        sender.setARP("10.0.0.1","00:04:00:00:00:01")
 
     receiver=net.getNodeByName(receiver_name)
     receiver.setDefaultRoute("dev eth0")
     for i in range(sender_count):
-        receiver.setARP("10.0.0.1%d"%i,"00:04:00:00:00:0%d"%i)
+        receiver.setARP("10.0.0.%d"%(i+2),"00:04:00:00:00:%02x"%(i+2))
 
 
 def main():
 
     sender_count=10
-    senders_sub_name="l"
-    receiver_name="r1"
+    senders_sub_name="h"
+    receiver_name="h0"
     switch_name="s1"
     topo = figure4Topo(args.behavioral_exe,
                        args.json,
@@ -122,6 +120,8 @@ def main():
 
     sleep(1)
 
+    #test auto insert table entries
+    subprocess.call(['./add_entries.sh'])
     print("Ready !")
 
     CLI(net)

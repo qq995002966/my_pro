@@ -1,0 +1,14 @@
+set style line 1 lt 1 lc rgb '#000000' lw 2.5 pt 5 ps 1.5 # blue
+set style line 2 lt 3 lc rgb '#bdbdbd' lw 2.5 pt 6 ps 1.5 # orange
+set style line 3 lt 2 lc rgb '#757575' lw 2.5 pt 7 ps 1.5 # orange
+set key above center
+set xlabel "Time [sec]"
+set ylabel 'Queue Occupancy [KB]'
+#set title title
+unset title
+set grid
+set xrange [0:12]
+set terminal pngcairo enhanced dashed font 'Verdana,16'
+#set terminal wxt dashed
+set output outfile
+plot for [i=1:words(files)] word(files,i) using 1:($2/1000) with lines ls i title word(keys,i)

@@ -14,27 +14,35 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-header_type ethernet_t {
-    fields {
-        dstAddr : 48;
-        srcAddr : 48;
-        etherType : 16;
-    }
+/*
+ * Mirror processing
+ */
+
+action set_mirror_nhop(nhop_idx) {
+    modify_field(l3_metadata.nexthop_index, nhop_idx);
 }
 
-header_type ipv4_t {
-    fields {
-        version : 4;
-        ihl : 4;
-        diffserv : 8;
-        totalLen : 16;
-        identification : 16;
-        flags : 3;
-        fragOffset : 13;
-        ttl : 8;
-        protocol : 8;
-        hdrChecksum : 16;
-        srcAddr : 32;
-        dstAddr: 32;
+action set_mirror_bd(bd) {
+    modify_field(egress_metadata.bd, bd);
+}
+
+table mirror {
+    reads {
+        i2e_metadata.mirror_session_id : exact;
     }
+    actions {
+        nop;
+        set_mirror_nhop;
+        set_mirror_bd;
+#ifdef SFLOW_ENABLE
+        sflow_pkt_to_cpu;
+#endif
+    }
+    size : MIRROR_SESSIONS_TABLE_SIZE;
+}
+
+control process_mirroring {
+#ifndef MIRROR_DISABLE
+    apply(mirror);
+#endif /* MIRROR_DISABLE */
 }

@@ -1,16 +1,3 @@
-table_add forward set_dmac 10.0.0.1 => 00:04:00:00:00:01
-
-table_add forward set_dmac 10.0.0.2 => 00:04:00:00:00:02
-table_add forward set_dmac 10.0.0.3 => 00:04:00:00:00:03
-table_add forward set_dmac 10.0.0.4 => 00:04:00:00:00:04
-table_add forward set_dmac 10.0.0.5 => 00:04:00:00:00:05
-table_add forward set_dmac 10.0.0.6 => 00:04:00:00:00:06
-table_add forward set_dmac 10.0.0.7 => 00:04:00:00:00:07
-table_add forward set_dmac 10.0.0.8 => 00:04:00:00:00:08
-table_add forward set_dmac 10.0.0.9 => 00:04:00:00:00:09
-table_add forward set_dmac 10.0.0.10 => 00:04:00:00:00:10
-table_add forward set_dmac 10.0.0.11 => 00:04:00:00:00:11
-
 table_add ipv4_lpm set_nhop 10.0.0.1/32 => 10.0.0.1 1
 
 table_add ipv4_lpm set_nhop 10.0.0.2/32 => 10.0.0.2 2
@@ -24,3 +11,4 @@ table_add ipv4_lpm set_nhop 10.0.0.9/32 => 10.0.0.7 9
 table_add ipv4_lpm set_nhop 10.0.0.10/32 => 10.0.0.8 10
 table_add ipv4_lpm set_nhop 10.0.0.11/32 => 10.0.0.9 11
 
+set_queue_depth 1048576

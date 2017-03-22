@@ -95,15 +95,19 @@ class Figure4Topo(Topo):
         for h in range(n-1):
             hosts.append(self.addHost('h%d' % (h+1),
                                     mac='00:04:00:00:00:%02x' %(h+2),
-                                    **hconfig))
+                                    ))
+                                    # **hconfig))
 
 
         # Create links between receiver and switch
-        self.addLink(receiver, switch, cls=Link,
-                      cls1=TCIntf, cls2=TCIntf,
-                      params1=lconfig_receiver, params2=lconfig_switch)
+        self.addLink(receiver, switch
+                     # , cls=Link, cls1=TCIntf, cls2=TCIntf,
+                      # params1=lconfig_receiver, params2=lconfig_switch)
+                     )
 
 
         # Create links between senders and switch
         for i in range(n-1):
-	    self.addLink(hosts[i], switch, **lconfig_sender)
+	    self.addLink(hosts[i], switch
+                  # , **lconfig_sender)
+                  )

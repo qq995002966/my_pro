@@ -256,27 +256,38 @@ def start_qmon(iface, interval_sec=0.01, outfile="q.txt"):
     return monitor
 
 # Start the receiver of the flows, its fixed to be h0 here
-def start_receiver(net):
+
+def turn_off_TGG(net):
+    for i in range(args.hosts):
+        hn=net.getNodeByName('h%d'%i)
+#I add gro off my self to test speed
+        hn.popen("ethtool -K h%d-eth0 tso off gso off gro off" % i)
+def set_receiver_arp(net):
     h0 = net.getNodeByName('h0')
     print ("Set receiver default route and arp")
     h0.setDefaultRoute("dev eth0")
-    print("############################################################")
-    print ("args.hosts is %d"%(args.hosts))
+
     for i in range(args.hosts-1):
         h0.setARP("10.0.0.%d"%(i+2),"00:04:00:00:00:%02x"%(i+2))
+
+def start_receiver(net):
+    h0 = net.getNodeByName('h0')
+#I add tso , gso , gro off myself to test the spped
     print "Starting iperf server..."
     server = h0.popen("%s -s -w 16m" % CUSTOM_IPERF_PATH)
 
 # Start senders sending traffic to receiver h0
-def start_senders(net,ecn1,ecnrest,algo1,algorest,vtcp,vtcprest,cutoff):
-    h0 = net.getNodeByName('h0')
+
+def set_senders_arp(net):
     for i in range(args.hosts-1):
-        print "Starting iperf client..."
         hn = net.getNodeByName('h%d' %(i+1))
         print "Set sender defaut route and arp"
         hn.setDefaultRoute("dev eth0")
         hn.setARP("10.0.0.1","00:04:00:00:0:01")
-
+def start_senders(net,ecn1,ecnrest,algo1,algorest,vtcp,vtcprest,cutoff):
+    h0 = net.getNodeByName('h0')
+    for i in range(args.hosts-1):
+        hn = net.getNodeByName('h%d' %(i+1))
         if i < cutoff:
             algo = algo1
             ecn = ecn1
@@ -288,7 +299,7 @@ def start_senders(net,ecn1,ecnrest,algo1,algorest,vtcp,vtcprest,cutoff):
             hn.popen("sysctl -w net.ipv4.tcp_ecn=%u" % ecn)
 
         # hn.popen("sysctl -w net.ipv4.tcp_vtcp=%u" % curvtcp)
-        hn.popen("ethtool -K h%d-eth0 tso off gso off" % (i+1))
+        print "Starting iperf client..."
         print "%s -c " % CUSTOM_IPERF_PATH + h0.IP() + " -t 1000 -Z %s" % algo
         client = hn.popen("%s -c " % CUSTOM_IPERF_PATH + h0.IP() + " -t 1000 -Z %s" % algo)
         #client = hn.popen("%s -c " % CUSTOM_IPERF_PATH + h0.IP() + " -t 1000")
@@ -344,18 +355,28 @@ def tcpfair():
                        enable_red=args.red,
                        red_params=red_settings,
                        show_mininet_commands=0)
-    net = Mininet(topo=topo, host=P4Host,switch=P4Switch, link=TCLink,
-                  autoPinCpus=True)
+    net = Mininet(topo=topo,switch=P4Switch,controller=None
+                  # host=P4Host,switch=P4Switch,
+                  # link=TCLink,controller=None
+                  # ,link=TCLink, autoPinCpus=True)
+                  )
 
     net.start()
+
+    set_receiver_arp(net)
+    set_senders_arp(net)
+    turn_off_TGG(net)
     # This dumps the topology and how nodes are interconnected through
     # links.
     dumpNodeConnections(net.hosts)
     #add entries to p4switch
     subprocess.call(['./add_entries.sh'])
+    cprint("Ready~!",'green')
 
-
-    # This performs a basic all pairs ping test.
+    # CLI(net)
+    # net.stop()
+    # sys.exit()
+##the follow 4 line is necessary,
     iface="s0-eth1"
     set_red(iface,red_settings)
     os.system("tc -d qdisc show dev %s" % iface)
@@ -366,6 +387,10 @@ def tcpfair():
     #set_speed(iface, "2Gbit")
     start_receiver(net)
     start_senders(net,args.ecn,args.ecnrest,args.cong1,args.congrest,args.vtcp,args.vtcprest,args.cutoff)
+
+
+    # CLI(net)
+
     #test ping all
     # net.pingAll()
     #start_senders(net,args.ecn)

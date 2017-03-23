@@ -9,6 +9,9 @@ basic_pro/figures
 basic_pro/simple_router.json
 basic_pro/tcpfair
 basic_pro/tcpfair_backup
+basic_pro/compile_p4src.sh
+
+
 vcc-exp
 topo/switch.json
 .ropeproject

@@ -29,6 +29,21 @@ header_type routing_metadata_t {
 
 metadata routing_metadata_t routing_metadata;
 
+header_type queueing_metadata_t {
+  fields {
+    enq_timestamp: 48;
+
+    enq_qdepth: 16;
+
+    deq_timedelta: 32;
+
+    deq_qdepth: 16;
+
+  }
+}
+
+metadata queueing_metadata_t queueing_metadata;
+
 action set_nhop(nhop_ipv4, port) {
     modify_field(routing_metadata.nhop_ipv4, nhop_ipv4);
     modify_field(standard_metadata.egress_spec, port);
@@ -83,6 +98,25 @@ control ingress {
 
 control egress {//这个egress是在哪里起作用的呀?这难道也是关键字么?
     apply(send_frame);
+	if(queueing_metadata.enq_qdepth>=40){
+		apply(simple_ecn);
+	}
 }
 
+/*******************************************************/
 
+table simple_ecn {//感觉这样写是有问题的,不应该使用一个表这样来实现这个逻辑,
+					//但是暂时没想到除了这个方法应该怎么弄,暂时先姑且这样吧.
+	reads{
+		ipv4.ecn:exact;
+	}
+	actions{
+		set_ece;
+		_drop;
+	}
+	size:512;
+}
+
+action set_ece(){
+	modify_field(ipv4.ecn,3);
+}

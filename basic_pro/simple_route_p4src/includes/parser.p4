@@ -36,6 +36,7 @@ field_list ipv4_checksum_list {
         ipv4.version;
         ipv4.ihl;
         ipv4.diffserv;
+		ipv4.ecn;
         ipv4.totalLen;
         ipv4.identification;
         ipv4.flags;

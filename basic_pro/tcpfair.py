@@ -373,9 +373,9 @@ def tcpfair():
     subprocess.call(['./add_entries.sh'])
     cprint("Ready~!",'green')
 
-    # CLI(net)
-    # net.stop()
-    # sys.exit()
+    CLI(net)
+    net.stop()
+    sys.exit()
 ##the follow 4 line is necessary,
     iface="s0-eth1"
     set_red(iface,red_settings)

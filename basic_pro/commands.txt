@@ -10,5 +10,3 @@ table_add ipv4_lpm set_nhop 10.0.0.8/32 => 10.0.0.6 8
 table_add ipv4_lpm set_nhop 10.0.0.9/32 => 10.0.0.7 9
 table_add ipv4_lpm set_nhop 10.0.0.10/32 => 10.0.0.8 10
 table_add ipv4_lpm set_nhop 10.0.0.11/32 => 10.0.0.9 11
-
-set_queue_depth 1048576

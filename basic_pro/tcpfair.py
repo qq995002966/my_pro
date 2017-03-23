@@ -355,8 +355,8 @@ def tcpfair():
                        enable_red=args.red,
                        red_params=red_settings,
                        show_mininet_commands=0)
-    net = Mininet(topo=topo,switch=P4Switch,controller=None
-                  # host=P4Host,switch=P4Switch,
+    net = Mininet(topo=topo, host=P4Host,switch=P4Switch,
+                  controller=None
                   # link=TCLink,controller=None
                   # ,link=TCLink, autoPinCpus=True)
                   )
@@ -373,9 +373,9 @@ def tcpfair():
     subprocess.call(['./add_entries.sh'])
     cprint("Ready~!",'green')
 
-    # CLI(net)
-    # net.stop()
-    # sys.exit()
+    CLI(net)
+    net.stop()
+    sys.exit()
 ##the follow 4 line is necessary,
     iface="s0-eth1"
     set_red(iface,red_settings)
@@ -389,7 +389,6 @@ def tcpfair():
     start_senders(net,args.ecn,args.ecnrest,args.cong1,args.congrest,args.vtcp,args.vtcprest,args.cutoff)
 
 
-    # CLI(net)
 
     #test ping all
     # net.pingAll()

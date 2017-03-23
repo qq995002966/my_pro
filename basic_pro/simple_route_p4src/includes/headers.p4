@@ -26,8 +26,7 @@ header_type ipv4_t {
     fields {
         version : 4;
         ihl : 4;
-        diffserv : 6;
-		ecn : 2 ;
+        diffserv : 8;
         totalLen : 16;
         identification : 16;
         flags : 3;

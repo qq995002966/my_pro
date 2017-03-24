@@ -378,8 +378,8 @@ def tcpfair():
     # sys.exit()
 ##the follow 4 line is necessary,
     iface="s0-eth1"
-    set_red(iface,red_settings)
-    os.system("tc -d qdisc show dev %s" % iface)
+    # set_red(iface,red_settings)
+    # os.system("tc -d qdisc show dev %s" % iface)
     os.system("sudo dumpcap -s 90 -i %s -a duration:100 &" % iface)
 
     # Allow for connections to be set up initially and then revert back the

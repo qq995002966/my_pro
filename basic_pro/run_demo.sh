@@ -22,8 +22,9 @@ if [ ! -d "$figdir" ]; then
 fi
 
 label="10s"
-bw=100
-./tcp_fair_RED.sh  ${bw}  ${label}  RED1tab
-cp ./tcpfair/$label-RED1-${bw}mbps-c1/goodput.png ${figdir}/fig4c.png
-cp ./tcpfair/$label-RED1-${bw}mbps-c5/goodput.png ${figdir}/fig4b.png
-cp ./tcpfair/$label-RED1-${bw}mbps-c9/goodput.png ${figdir}/fig4a.png
+#bw=100
+./tcp_fair_RED.sh  30  ${label}  RED1tab
+./tcp_fair_RED.sh  50  ${label}  RED1tab
+./tcp_fair_RED.sh  100  ${label}  RED1tab
+./tcp_fair_RED.sh  200  ${label}  RED1tab
+./tcp_fair_RED.sh  500  ${label}  RED1tab

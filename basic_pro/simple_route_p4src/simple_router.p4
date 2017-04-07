@@ -98,7 +98,7 @@ control ingress {
 
 control egress {//这个egress是在哪里起作用的呀?这难道也是关键字么?
     apply(send_frame);
-	if(queueing_metadata.enq_qdepth>=10){
+	if(queueing_metadata.enq_qdepth>=5){
 		apply(simple_ecn);
 	}
 }

@@ -112,9 +112,18 @@ table simple_ecn {//感觉这样写是有问题的,不应该使用一个表这�
 	}
 	actions{
 		set_ece;
+		set_vcc;
 		_drop;
 	}
 	size:512;
+}
+
+action set_vcc(){
+	//只是为了实现特别简单的vcc逻辑，
+	//就单单把TCP数据包的接收窗口减半试试
+	//但是在实现这个逻辑之前需要修改parser.p4让交换机能够支持
+	//TCP协议
+	modify_field(tcp.window,tcp.window/2);
 }
 
 action set_ece(){

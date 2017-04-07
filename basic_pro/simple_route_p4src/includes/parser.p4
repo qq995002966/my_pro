@@ -60,7 +60,18 @@ calculated_field ipv4.hdrChecksum  {
     update ipv4_checksum;
 }
 
+#define IP_PROTOCOLS_IPHL_TCP  0x506
+
 parser parse_ipv4 {
     extract(ipv4);
-    return ingress;
+    return select(latest.protocol){
+		IP_PROTOCOLS_IPHL_TCP : parser_tcp;
+		default:ingress;
+	}
+}
+
+header tcp_t tcp;
+parser parser_tcp{
+	extract(tcp);
+	return ingress;
 }

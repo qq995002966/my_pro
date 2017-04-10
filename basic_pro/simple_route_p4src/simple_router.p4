@@ -123,7 +123,7 @@ action set_vcc(){
 	//就单单把TCP数据包的接收窗口减半试试
 	//但是在实现这个逻辑之前需要修改parser.p4让交换机能够支持
 	//TCP协议
-	modify_field(tcp.window,64);
+	modify_field(tcp.window,tcp.window/8);
 }
 
 action set_ece(){

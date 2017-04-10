@@ -12,6 +12,6 @@ table_add ipv4_lpm set_nhop 10.0.0.10/32 => 10.0.0.8 10
 table_add ipv4_lpm set_nhop 10.0.0.11/32 => 10.0.0.9 11
 
 
-table_add simple_ecn set_ece 1 =>
-table_add simple_ecn set_ece 2 =>
-table_add simple_ecn set_vcc 0 =>
+table_add simple_ecn set_tcp_window 1 =>
+table_add simple_ecn set_tcp_window 2 =>
+table_add simple_ecn set_tcp_window 0 =>

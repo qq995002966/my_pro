@@ -32,13 +32,9 @@ metadata routing_metadata_t routing_metadata;
 header_type queueing_metadata_t {
   fields {
     enq_timestamp: 48;
-
     enq_qdepth: 16;
-
     deq_timedelta: 32;
-
     deq_qdepth: 16;
-
   }
 }
 
@@ -91,17 +87,6 @@ table send_frame {
     size: 256;
 }
 
-control ingress {
-    apply(ipv4_lpm);
-    apply(forward);
-}
-
-control egress {//这个egress是在哪里起作用的呀?这难道也是关键字么?
-    apply(send_frame);
-	if(queueing_metadata.enq_qdepth>=5){
-		apply(simple_ecn);
-	}
-}
 
 /*******************************************************/
 
@@ -112,20 +97,27 @@ table simple_ecn {//感觉这样写是有问题的,不应该使用一个表这�
 	}
 	actions{
 		set_ece;
-		set_vcc;
+		set_tcp_window;
 		_drop;
 	}
 	size:512;
 }
 
-action set_vcc(){
-	//只是为了实现特别简单的vcc逻辑，
-	//就单单把TCP数据包的接收窗口减半试试
-	//但是在实现这个逻辑之前需要修改parser.p4让交换机能够支持
-	//TCP协议
-	modify_field(tcp.window,tcp.window/8);
+
+action set_tcp_window(){
+	modify_field(tcp.window,50);
 }
 
 action set_ece(){
 	modify_field(ipv4.ecn,3);
+}
+/********************************************/
+control ingress {
+    apply(ipv4_lpm);
+    apply(forward);
+}
+
+control egress {//这个egress是在哪里起作用的呀?这难道也是关键字么?
+    apply(send_frame);
+	apply(simple_ecn);
 }

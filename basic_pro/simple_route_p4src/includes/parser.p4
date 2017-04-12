@@ -60,12 +60,22 @@ calculated_field ipv4.hdrChecksum  {
     update ipv4_checksum;
 }
 
-#define IP_PROTOCOLS_IPHL_TCP  0x506
+
+header_type tcp_checksum_metadata_t {
+	fields {
+		tcpLength : 16;
+	}
+}
+
+metadata tcp_checksum_metadata_t tcp_checksum_metadata;
+
+#define IP_PROTOCOLS_TCP  0x6
 
 parser parse_ipv4 {
     extract(ipv4);
+	set_metadata(tcp_checksum_metadata.tcpLength,ipv4.totalLen - 20);
     return select(latest.protocol){
-		IP_PROTOCOLS_IPHL_TCP : parser_tcp;
+		IP_PROTOCOLS_TCP : parser_tcp;
 		default:ingress;
 	}
 }
@@ -74,4 +84,37 @@ header tcp_t tcp;
 parser parser_tcp{
 	extract(tcp);
 	return ingress;
+}
+
+
+field_list tcp_checksum_list {
+	ipv4.srcAddr;
+	ipv4.dstAddr;
+	8'0;
+	ipv4.protocol;
+	tcp_checksum_metadata.tcpLength;
+	tcp.srcPort;
+	tcp.dstPort;
+	tcp.seqNo;
+	tcp.ackNo;
+	tcp.dataOffset;
+	tcp.res;
+	tcp.ecn;
+	tcp.ctrl;
+	tcp.window;
+	tcp.urgentPtr;
+	payload;
+}
+
+field_list_calculation tcp_checksum {
+	input {
+		tcp_checksum_list;
+	}
+	algorithm : csum16;
+	output_width : 16;
+}
+
+calculated_field tcp.checksum {
+	    verify tcp_checksum if(valid(tcp));
+		update tcp_checksum if(valid(tcp));
 }

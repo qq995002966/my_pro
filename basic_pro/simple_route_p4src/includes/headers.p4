@@ -39,6 +39,7 @@ header_type ipv4_t {
         dstAddr: 32;
     }
 }
+
 header_type tcp_t {
 	fields {
 		srcPort : 16;
@@ -46,8 +47,9 @@ header_type tcp_t {
 		seqNo : 32;
 		ackNo : 32;
 		dataOffset : 4;
-		res : 4;
-		flags : 8;
+		res : 3;
+		ecn : 3;
+		ctrl : 6;
 		window : 16;
 		checksum : 16;
 		urgentPtr : 16;

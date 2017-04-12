@@ -90,8 +90,8 @@ table send_frame {
 
 /*******************************************************/
 
-table simple_ecn {//感觉这样写是有问题的,不应该使用一个表这样来实现这个逻辑,
-					//但是暂时没想到除了这个方法应该怎么弄,暂时先姑且这样吧.
+table simple_ecn {
+		//可能这个地方用 register语义上更合适
 	reads{
 		ipv4.ecn:exact;
 	}
@@ -117,7 +117,9 @@ control ingress {
     apply(forward);
 }
 
-control egress {//这个egress是在哪里起作用的呀?这难道也是关键字么?
+control egress {
     apply(send_frame);
-	apply(simple_ecn);
+	if(queueing_metadata.deq_qdepth>3){
+		apply(simple_ecn);
+	}
 }

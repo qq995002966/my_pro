@@ -105,7 +105,7 @@ table simple_ecn {
 
 
 action set_tcp_window(){
-	modify_field(tcp.window,50);
+	modify_field(tcp.window,tcp.window/2);
 }
 
 action set_ece(){
@@ -119,7 +119,8 @@ control ingress {
 
 control egress {
     apply(send_frame);
-	if(queueing_metadata.deq_qdepth>3){
+	if(queueing_metadata.enq_qdepth>=3){
 		apply(simple_ecn);
 	}
+
 }

@@ -73,7 +73,7 @@ metadata tcp_checksum_metadata_t tcp_checksum_metadata;
 
 parser parse_ipv4 {
     extract(ipv4);
-	set_metadata(tcp_checksum_metadata.tcpLength,latest.totalLen);
+	set_metadata(tcp_checksum_metadata.tcpLength,ipv4.totalLen - 20);
     return select(latest.protocol){
 		IP_PROTOCOLS_TCP : parser_tcp;
 		default:ingress;
@@ -85,7 +85,6 @@ parser parser_tcp{
 	extract(tcp);
 	return ingress;
 }
-
 
 
 field_list tcp_checksum_list {
@@ -116,6 +115,6 @@ field_list_calculation tcp_checksum {
 }
 
 calculated_field tcp.checksum {
-	//update tcp_checksum if(valid(tcp));
-	update tcp_checksum;
+	    verify tcp_checksum if(valid(tcp));
+		update tcp_checksum if(valid(tcp));
 }

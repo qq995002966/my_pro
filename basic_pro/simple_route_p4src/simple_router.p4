@@ -32,13 +32,9 @@ metadata routing_metadata_t routing_metadata;
 header_type queueing_metadata_t {
   fields {
     enq_timestamp: 48;
-
     enq_qdepth: 16;
-
     deq_timedelta: 32;
-
     deq_qdepth: 16;
-
   }
 }
 
@@ -91,15 +87,6 @@ table send_frame {
     size: 256;
 }
 
-control ingress {
-    apply(ipv4_lpm);
-    apply(forward);
-}
-
-control egress {//这个egress是在哪里起作用的呀?这难道也是关键字么?
-    apply(send_frame);
-	apply(simple_ecn);
-}
 
 /*******************************************************/
 
@@ -123,4 +110,14 @@ action set_tcp_window(){
 
 action set_ece(){
 	modify_field(ipv4.ecn,3);
+}
+/********************************************/
+control ingress {
+    apply(ipv4_lpm);
+    apply(forward);
+}
+
+control egress {//这个egress是在哪里起作用的呀?这难道也是关键字么?
+    apply(send_frame);
+	apply(simple_ecn);
 }

@@ -118,7 +118,7 @@ table simple_ecn {//感觉这样写是有问题的,不应该使用一个表这�
 
 
 action set_tcp_window(){
-	modify_field(tcp.window,tcp.64);
+	modify_field(tcp.window,50);
 }
 
 action set_ece(){

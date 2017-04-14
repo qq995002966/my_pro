@@ -290,13 +290,14 @@ def start_senders(net,ecn1,ecnrest,algo1,algorest,vtcp,vtcprest,cutoff):
         hn = net.getNodeByName('h%d' %(i+1))
         if i < cutoff:
             algo = algo1
-            ecn = ecn1
+            ecn = ecn1  #enc=0
             curvtcp = vtcp
         else:
             algo = algorest
-            ecn=ecnrest
+            ecn=ecnrest #ecnrest = 1
             curvtcp = vtcprest
-            hn.popen("sysctl -w net.ipv4.tcp_ecn=%u" % ecn)
+
+        hn.popen("sysctl -w net.ipv4.tcp_ecn=%u" % ecn)
 
         # hn.popen("sysctl -w net.ipv4.tcp_vtcp=%u" % curvtcp)
         print "Starting iperf client..."

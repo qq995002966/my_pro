@@ -24,3 +24,11 @@ fi
 label="10s"
 bw=200
 ./tcp_fair_RED.sh  ${bw}  ${label}  RED1tab
+
+
+cd ./tcpfair
+
+rm -rf $(find|egrep '*.txt|*.out|*.gz|out.wireshark*')
+cd ..
+tar -cf tcpfair.tar ./tcpfair/
+

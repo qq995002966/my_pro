@@ -21,6 +21,18 @@ action _drop() {
     drop();
 }
 
+header_type test_registers_metadata_t{
+	fields{
+		register_tmp:16;
+	}
+}
+
+metadata test_registers_metadata_t test_registers_metadata;
+
+register test_registers{
+	width:16;
+	instance_count:128;
+}
 header_type routing_metadata_t {
     fields {
         nhop_ipv4 : 32;
@@ -76,13 +88,35 @@ table send_frame {
     size: 256;
 }
 
+action modify_ttl_with_register(){
+	register_read(test_registers_metadata.register_tmp,test_registers,0);
+	modify_field(ipv4.ttl,test_registers_metadata.register_tmp);
+}
+
+table table_modify_ttl_with_register{
+	actions{
+		modify_ttl_with_register;
+	}
+}
+
 control ingress {
     apply(ipv4_lpm);
     apply(forward);
+	apply(table_test_write_register);
 }
 
 control egress {//这个egress是在哪里起作用的呀?这难道也是关键字么?
     apply(send_frame);
+	apply(table_modify_ttl_with_register);
 }
 
+/*为了测试写寄存器*/
+table table_test_write_register{
+	actions{
+		action_test_write_register;
+	}
+}
 
+action action_test_write_register(){
+	register_write(test_registers,1,ipv4.ttl);
+}

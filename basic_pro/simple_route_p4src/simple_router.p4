@@ -105,22 +105,89 @@ table simple_ecn {
 
 
 action set_tcp_window(){
-	modify_field(tcp.window,tcp.window/2);
+	modify_field(tcp.window,(tcp.window*3)/4);
 }
 
 action set_ece(){
 	modify_field(ipv4.ecn,3);
 }
+/*使用寄存器实现vcc逻辑*******************************/
+/*在ingress 控制流中存储每个端口的数据包的窗口值大小到对应的
+register中*/
+register register_vcc{
+	width:16;
+	instance_count:128;
+}
+table table_vcc_store_windows{
+	actions{
+		action_vcc_store_windows;
+	}
+}
+action action_vcc_store_windows(){
+	register_write(register_vcc,standard_metadata.ingress_port,tcp.window);
+}
+/*在egress中设置如果出去的端口值为1，那么将其window设置成为
+其他的2~11端口对应的寄存器的平均值*/
+header_type metadata_vcc_t{
+	fields{
+		register_temp1:16;
+		register_temp2:16;
+		register_temp3:16;
+		register_temp4:16;
+		register_temp5:16;
+		register_temp6:16;
+		register_temp7:16;
+		register_temp8:16;
+		register_temp9:16;
+		register_temp10:16;
+		register_temp11:16;
+	}
+}
+metadata metadata_vcc_t metadata_vcc;
+table table_vcc_set_window{
+	actions{
+		action_vcc_set_window;
+	}
+}
+action action_vcc_set_window(){
+	register_read(metadata_vcc.register_temp3,register_vcc,3);
+	register_read(metadata_vcc.register_temp4,register_vcc,4);
+	register_read(metadata_vcc.register_temp5,register_vcc,5);
+	register_read(metadata_vcc.register_temp6,register_vcc,6);
+	register_read(metadata_vcc.register_temp7,register_vcc,7);
+	register_read(metadata_vcc.register_temp8,register_vcc,8);
+	register_read(metadata_vcc.register_temp9,register_vcc,9);
+	register_read(metadata_vcc.register_temp10,register_vcc,10);
+	register_read(metadata_vcc.register_temp11,register_vcc,11);
+
+	modify_field(tcp.window,( 
+								metadata_vcc.register_temp2+
+								metadata_vcc.register_temp3+
+								metadata_vcc.register_temp4+
+								metadata_vcc.register_temp5+
+								metadata_vcc.register_temp6+
+								metadata_vcc.register_temp7+
+								metadata_vcc.register_temp8+
+								metadata_vcc.register_temp9+
+								metadata_vcc.register_temp10+
+								metadata_vcc.register_temp11
+								)/10);
+}
 /********************************************/
 control ingress {
     apply(ipv4_lpm);
     apply(forward);
+	
+	apply(table_vcc_store_windows);
 }
 
 control egress {
     apply(send_frame);
 	if(queueing_metadata.enq_qdepth>=3){
-		apply(simple_ecn);
+		apply(simple_ecn);//如果用register实现vcc的话，
+				//这里的对应的commands.txt中的表项就不能有_drop
+				//也不能有 set_tcp_window了
 	}
-
+				//链接的就是h1 
+	apply(table_vcc_set_window);
 }

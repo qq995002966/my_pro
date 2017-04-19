@@ -124,11 +124,14 @@ table table_vcc_store_windows{
 	}
 }
 action action_vcc_store_windows(){
-	register_write(register_vcc,standard_metadata.ingress_port,tcp.window);
+	register_write(register_vcc,standard_metadata.egress_spec,
+	tcp.window);
+	/*register_write(register_vcc,standard_metadata.ingress_port,*/
+	/*ipv4.totalLen);*/
 }
 /*在egress中设置如果出去的端口值为1，那么将其window设置成为
 其他的2~11端口对应的寄存器的平均值*/
-header_type metadata_vcc_t{
+header_type metadata_vcc_register_temp_t{
 	fields{
 		register_temp1:16;
 		register_temp2:16;
@@ -143,35 +146,53 @@ header_type metadata_vcc_t{
 		register_temp11:16;
 	}
 }
-metadata metadata_vcc_t metadata_vcc;
+metadata metadata_vcc_register_temp_t metadata_vcc_register_temp;
 table table_vcc_set_window{
 	actions{
 		action_vcc_set_window;
+		action_test_vcc;
 	}
 }
 action action_vcc_set_window(){
-	register_read(metadata_vcc.register_temp3,register_vcc,3);
-	register_read(metadata_vcc.register_temp4,register_vcc,4);
-	register_read(metadata_vcc.register_temp5,register_vcc,5);
-	register_read(metadata_vcc.register_temp6,register_vcc,6);
-	register_read(metadata_vcc.register_temp7,register_vcc,7);
-	register_read(metadata_vcc.register_temp8,register_vcc,8);
-	register_read(metadata_vcc.register_temp9,register_vcc,9);
-	register_read(metadata_vcc.register_temp10,register_vcc,10);
-	register_read(metadata_vcc.register_temp11,register_vcc,11);
+	register_read(metadata_vcc_register_temp.register_temp2,register_vcc,2);
+	register_read(metadata_vcc_register_temp.register_temp3,register_vcc,3);
+	register_read(metadata_vcc_register_temp.register_temp4,register_vcc,4);
+	register_read(metadata_vcc_register_temp.register_temp5,register_vcc,5);
+	register_read(metadata_vcc_register_temp.register_temp6,register_vcc,6);
+	register_read(metadata_vcc_register_temp.register_temp7,register_vcc,7);
+	register_read(metadata_vcc_register_temp.register_temp8,register_vcc,8);
+	register_read(metadata_vcc_register_temp.register_temp9,register_vcc,9);
+	register_read(metadata_vcc_register_temp.register_temp10,register_vcc,10);
+	register_read(metadata_vcc_register_temp.register_temp11,register_vcc,11);
 
 	modify_field(tcp.window,( 
-								metadata_vcc.register_temp2+
-								metadata_vcc.register_temp3+
-								metadata_vcc.register_temp4+
-								metadata_vcc.register_temp5+
-								metadata_vcc.register_temp6+
-								metadata_vcc.register_temp7+
-								metadata_vcc.register_temp8+
-								metadata_vcc.register_temp9+
-								metadata_vcc.register_temp10+
-								metadata_vcc.register_temp11
-								)/10);
+								metadata_vcc_register_temp.register_temp3+
+								metadata_vcc_register_temp.register_temp4+
+								metadata_vcc_register_temp.register_temp5+
+								metadata_vcc_register_temp.register_temp6+
+								metadata_vcc_register_temp.register_temp7+
+								metadata_vcc_register_temp.register_temp8+
+								metadata_vcc_register_temp.register_temp9+
+								metadata_vcc_register_temp.register_temp10+
+								metadata_vcc_register_temp.register_temp11
+								)/9);
+	register_write(register_vcc,100,tcp.window);
+	/*register_write(register_vcc,100,(*/
+								/*metadata_vcc_register_temp.register_temp3+*/
+								/*metadata_vcc_register_temp.register_temp4+*/
+								/*metadata_vcc_register_temp.register_temp5+*/
+								/*metadata_vcc_register_temp.register_temp6+*/
+								/*metadata_vcc_register_temp.register_temp7+*/
+								/*metadata_vcc_register_temp.register_temp8+*/
+								/*metadata_vcc_register_temp.register_temp9+*/
+								/*metadata_vcc_register_temp.register_temp10+*/
+								/*metadata_vcc_register_temp.register_temp11*/
+								/*)/9*/
+								/*);*/
+}
+
+action action_test_vcc(){
+	modify_field(tcp.window,10);
 }
 /********************************************/
 control ingress {
@@ -188,6 +209,8 @@ control egress {
 				//这里的对应的commands.txt中的表项就不能有_drop
 				//也不能有 set_tcp_window了
 	}
-				//链接的就是h1 
-	apply(table_vcc_set_window);
+
+	if(standard_metadata.egress_spec==2){
+		apply(table_vcc_set_window);
+	}
 }

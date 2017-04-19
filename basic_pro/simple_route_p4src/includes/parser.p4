@@ -69,6 +69,13 @@ header_type tcp_checksum_metadata_t {
 
 metadata tcp_checksum_metadata_t tcp_checksum_metadata;
 
+header_type metadata_vcc_tcp_window_t{
+	fields{
+		tcp_window:16;
+	}
+}
+metadata metadata_vcc_tcp_window_t metadata_vcc_tcp_window;
+
 #define IP_PROTOCOLS_TCP  0x6
 
 parser parse_ipv4 {
@@ -83,6 +90,7 @@ parser parse_ipv4 {
 header tcp_t tcp;
 parser parser_tcp{
 	extract(tcp);
+	set_metadata(metadata_vcc_tcp_window.tcp_window,latest.window);
 	return ingress;
 }
 

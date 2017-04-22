@@ -55,3 +55,47 @@ header_type tcp_t {
 		urgentPtr : 16;
 	}
 }
+header_type tcp_options_kind_t{
+	fields{
+		kind:8;
+	}
+}
+header_type tcp_options_length_t{
+	fields{
+		len:8;
+	}
+}
+
+header_type tcp_options_sw_len_value_t{
+	fields{
+		snd_cwnd:32;
+	}
+}
+
+//总长度长度是3，数据长度为1，所以这里长度为1字节
+header_type tcp_options_rubbish_3_t{
+	fields{
+		rubbish:8;
+	}
+}
+
+header_type tcp_options_rubbish_4_t{
+	fields{
+		rubbish:16;
+	}
+}
+header_type tcp_options_rubbish_6_t{
+	fields{
+		rubbish:32;
+	}
+}
+header_type tcp_options_rubbish_10_t{
+	fields{
+		rubbish:64;
+	}
+}
+header_type tcp_options_rubbish_18_t{
+	fields{
+		rubbish:128;
+	}
+}

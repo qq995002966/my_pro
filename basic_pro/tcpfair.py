@@ -397,7 +397,6 @@ def tcpfair():
     #set_speed(iface, "%.2fMbit" % args.bw_net)
     # Let the experiment stabilize initially
     sleep(20)
-    sleep(100)
 
     # Start monitoring the queue sizes.
     #qmon = start_qmon(iface='s0-eth1',

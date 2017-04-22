@@ -28,7 +28,7 @@ bw=200
 
 cd ./tcpfair
 
-rm -rf $(find|egrep '*.txt|*.out|*.gz|out.wireshark*')
+#rm -rf $(find|egrep '*.txt|*.out|*.gz|out.wireshark*')
 cd ..
 tar -cf tcpfair.tar ./tcpfair/
 

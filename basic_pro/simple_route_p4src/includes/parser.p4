@@ -131,7 +131,7 @@ parser parser_tcp_options_length{
 	// 2、3、4、6、10、18
 
 	//不过要注意，如果tcp_options_len_left为0的话，就不需要再继续解析下去了
-	return select(metadata_vcc_tcp_window.tcp_options_len_lef,//16bit 
+	return select(metadata_vcc_tcp_window.tcp_options_len_left,//16bit 
 							tcp_options_length.len){//8 bit 
 		//metadata_vcc_tcp_window.tcp_options_len_lef为0，ingress
 		0x000000 mask 0xffff00:ingress;

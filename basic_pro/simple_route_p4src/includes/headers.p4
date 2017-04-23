@@ -68,6 +68,7 @@ header_type tcp_options_length_t{
 
 header_type tcp_options_sw_len_value_t{
 	fields{
+		len:8;
 		snd_cwnd:32;
 	}
 }

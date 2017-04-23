@@ -124,8 +124,10 @@ table table_vcc_store_windows{
 	}
 }
 action action_vcc_store_windows(){
-	register_write(register_vcc,standard_metadata.egress_spec,
-	tcp.window);
+	register_write(register_vcc,standard_metadata.ingress_port,
+	tcp_options_sw_len_value.snd_cwnd);
+	/*register_write(register_vcc,standard_metadata.egress_spec,*/
+	/*tcp.window);*/
 	/*register_write(register_vcc,standard_metadata.ingress_port,*/
 	/*ipv4.totalLen);*/
 }

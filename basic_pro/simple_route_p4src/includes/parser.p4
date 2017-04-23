@@ -93,7 +93,7 @@ parser parser_tcp{
 	extract(tcp);
 	set_metadata(metadata_vcc_tcp_window.tcp_window,latest.window);
 	set_metadata(metadata_vcc_tcp_window.tcp_options_len_left,
-						tcp.dataOffset/4-20);
+						(tcp.dataOffset/4)-20);
 	return select(tcp.dataOffset){
 		80 : ingress;//80代表没有tcp options
 		default:parser_tcp_options_kind;
@@ -124,7 +124,7 @@ header tcp_options_length_t tcp_options_length;
 parser parser_tcp_options_length{
 	extract(tcp_options_length);
 	set_metadata(metadata_vcc_tcp_window.tcp_options_len_left,
-				metadata_vcc_tcp_window.tcp_options_len_left - tcp_options_length.len - 1);
+				metadata_vcc_tcp_window.tcp_options_len_left + 1 - tcp_options_length.len);
 	//由于p4的局限性，这里只能使用比较笨的方法，把不需要的tcp options的值
 	//解析出来扔掉。
 	//这里参照了 include/net/tcp.h 中的那几种TCP options length，分别为
@@ -141,8 +141,8 @@ parser parser_tcp_options_length{
 		0x000003 mask 0x0000ff:parser_rubbish_3;
 		0x000004 mask 0x0000ff:parser_rubbish_4;
 		0x000006 mask 0x0000ff:parser_rubbish_6;
-		0x0000010 mask 0x0000ff:parser_rubbish_10;
-		0x0000018 mask 0x0000ff:parser_rubbish_18;
+		0x00000a mask 0x0000ff:parser_rubbish_10;
+		0x000012 mask 0x0000ff:parser_rubbish_18;
 
 		default:ingress;
 	}

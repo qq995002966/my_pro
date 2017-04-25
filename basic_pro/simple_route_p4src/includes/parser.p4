@@ -94,10 +94,11 @@ parser parser_tcp{
 	set_metadata(metadata_vcc_tcp_window.tcp_window,latest.window);
 	set_metadata(metadata_vcc_tcp_window.tcp_options_len_left,
 						(tcp.dataOffset/4)-20);
-	return select(tcp.dataOffset){
-		80 : ingress;//80代表没有tcp options
-		default:parser_tcp_options_kind;
-	}
+	return ingress;
+	/*return select(tcp.dataOffset){*/
+		/*80 : ingress;		//80代表没有tcp options*/
+		/*default:parser_tcp_options_kind;*/
+	/*}*/
 }
 header tcp_options_kind_t tcp_options_kind;
 parser parser_tcp_options_kind{
@@ -110,6 +111,7 @@ parser parser_tcp_options_kind{
 		//如果剩余的options字节长度为0，ingress
 		0x000000 mask 0xffff00:ingress;
 		//不为0，那么要看 tcp_options_kind.kind 的值
+		0x000000 mask 0x0000ff:ingress;
 		//tcp_options_kind.kind为 1,parser_tcp_options_kind
 		0x000001 mask 0x0000ff:parser_tcp_options_kind;
 		// 为10 ,是需要的那个 sw option，parser_tcp_options_sw,然后就进入ingress就行了
@@ -137,6 +139,9 @@ parser parser_tcp_options_length{
 		0x000000 mask 0xffff00:ingress;
 		//metadata_vcc_tcp_window.tcp_options_len_lef不为0
 		//这是要看tcp_options_length.len的值
+		//目的是解析掉不用的tcp options，
+		//下面的 2、3、4、6、10、12是参照内核net/tcp.h中的几个已经实现的
+		//tcp options长度来写的。
 		0x000002 mask 0x0000ff:parser_tcp_options_kind;
 		0x000003 mask 0x0000ff:parser_rubbish_3;
 		0x000004 mask 0x0000ff:parser_rubbish_4;

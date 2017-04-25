@@ -197,11 +197,24 @@ action action_test_vcc(){
 	modify_field(tcp.window,10);
 }
 /********************************************/
+// TCP OPTIONS
+table table_store_tcp_dataoff{
+	actions{
+		action_store_tcp_dataoff;
+	}
+}
+action action_store_tcp_dataoff{
+	register_write(register_vcc,22,tcp.dataOffset);
+	register_write(register_vcc,23,metadata_vcc_tcp_window.tcp_options_len_left);
+}
+
+/********************************************/
 control ingress {
     apply(ipv4_lpm);
     apply(forward);
 	
 	apply(table_vcc_store_windows);
+	apply(table_store_tcp_dataoff);
 }
 
 control egress {

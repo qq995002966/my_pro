@@ -373,9 +373,9 @@ def tcpfair():
     subprocess.call(['./add_entries.sh'])
     cprint("Ready~!",'green')
 
-    CLI(net)
-    net.stop()
-    sys.exit()
+    # CLI(net)
+    # net.stop()
+    # sys.exit()
 ##the follow 4 line is necessary,
     iface="s0-eth1"
     set_red(iface,red_settings)
@@ -396,6 +396,7 @@ def tcpfair():
     sleep(5)
     #set_speed(iface, "%.2fMbit" % args.bw_net)
     # Let the experiment stabilize initially
+    sleep(20)
     sleep(20)
 
     # Start monitoring the queue sizes.

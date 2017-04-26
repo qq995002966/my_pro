@@ -15,3 +15,4 @@ table_add simple_ecn set_ece 1 =>
 table_add simple_ecn set_ece 2 =>
 
 table_add table_vcc_store_windows action_vcc_store_windows =>
+table_add table_store_tcp_info action_store_tcp_info =>

@@ -203,7 +203,7 @@ table table_store_tcp_dataoff{
 		action_store_tcp_dataoff;
 	}
 }
-action action_store_tcp_dataoff{
+action action_store_tcp_dataoff(){
 	register_write(register_vcc,22,tcp.dataOffset);
 	register_write(register_vcc,23,metadata_vcc_tcp_window.tcp_options_len_left);
 }

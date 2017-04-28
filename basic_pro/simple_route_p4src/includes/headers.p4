@@ -56,6 +56,43 @@ header_type tcp_t {
 	}
 }
 
+
+header_type tcp_checksum_metadata_t {
+	fields {
+		tcpLength : 16;
+	}
+}
+
+
+header_type metadata_vcc_tcp_window_t{
+	fields{
+		tcp_window:16;//用来记录tcp。window事实证明，不许也这个东西也行
+		tcp_options_len_left:16;
+	}
+}
+
+
+register register_vcc{
+	width:16;
+	instance_count:128;
+}
+
+header_type routing_metadata_t {
+    fields {
+        nhop_ipv4 : 32;
+    }
+}
+
+
+header_type queueing_metadata_t {
+  fields {
+    enq_timestamp: 48;
+    enq_qdepth: 16;
+    deq_timedelta: 32;
+    deq_qdepth: 16;
+  }
+}
+
 header_type tcp_option_EOL_T{
 	fields{
 		kind:8;//0
@@ -128,5 +165,9 @@ header tcp_option_SACK_PERM_t tcp_option_SACK_PERM;
 header tcp_option_SACK_t tcp_option_SACK;
 header tcp_option_TIMESTAMP_t tcp_option_TIMESTAMP;
 header tcp_option_MD5SIG_t tcp_option_MD5SIG;
+metadata tcp_checksum_metadata_t tcp_checksum_metadata;
+metadata metadata_vcc_tcp_window_t metadata_vcc_tcp_window;
+metadata routing_metadata_t routing_metadata;
+metadata queueing_metadata_t queueing_metadata;
 
-@pragma header_ordering ethernet ipv4 tcp tcp_option_NOP tcp_option_MSS tcp_option_WINDOW tcp_option_SACK_PERM tcp_option_SACK tcp_option_TIMESTAMP tcp_option_MD5SIG tcp_option_EOL
+@pragma header_ordering ethernet ipv4 tcp tcp_option_MSS tcp_option_WINDOW tcp_option_SACK_PERM tcp_option_SACK tcp_option_TIMESTAMP tcp_option_MD5SIG tcp_option_NOP tcp_option_EOL

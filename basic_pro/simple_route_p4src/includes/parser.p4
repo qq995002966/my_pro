@@ -59,22 +59,6 @@ calculated_field ipv4.hdrChecksum  {
 }
 
 
-header_type tcp_checksum_metadata_t {
-	fields {
-		tcpLength : 16;
-	}
-}
-
-metadata tcp_checksum_metadata_t tcp_checksum_metadata;
-
-header_type metadata_vcc_tcp_window_t{
-	fields{
-		tcp_window:16;//用来记录tcp。window事实证明，不许也这个东西也行
-		tcp_options_len_left:16;
-	}
-}
-metadata metadata_vcc_tcp_window_t metadata_vcc_tcp_window;
-
 #define IP_PROTOCOLS_TCP  0x6
 
 parser parse_ipv4 {
@@ -93,7 +77,7 @@ parser parser_tcp{
 						(tcp.dataOffset*4)-20);
 	/*return ingress;*///这里是为了测试 tcp dataOffset字段
 	return select(tcp.dataOffset){
-		5 : ingress;		//80代表没有tcp options,可是这里好奇怪，具体请看onenote
+		0x5 : ingress;		//5代表没有tcp options
 		default:parser_tcp_options;
 	}
 }
@@ -109,7 +93,6 @@ parser parser_tcp_options{
 		0x000005 mask 0x0000ff : parser_tcp_options_SACK;
 		0x000008 mask 0x0000ff : parser_tcp_options_TIMESTAMP;
 		0x000013 mask 0x0000ff : parser_tcp_options_MD5SIG;
-		default : ingress;
 	}
 }
 

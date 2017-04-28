@@ -21,25 +21,6 @@ action _drop() {
     drop();
 }
 
-header_type routing_metadata_t {
-    fields {
-        nhop_ipv4 : 32;
-    }
-}
-
-metadata routing_metadata_t routing_metadata;
-
-header_type queueing_metadata_t {
-  fields {
-    enq_timestamp: 48;
-    enq_qdepth: 16;
-    deq_timedelta: 32;
-    deq_qdepth: 16;
-  }
-}
-
-metadata queueing_metadata_t queueing_metadata;
-
 action set_nhop(nhop_ipv4, port) {
     modify_field(routing_metadata.nhop_ipv4, nhop_ipv4);
     modify_field(standard_metadata.egress_spec, port);
@@ -114,10 +95,9 @@ action set_ece(){
 /*使用寄存器实现vcc逻辑*******************************/
 /*在ingress 控制流中存储每个端口的数据包的窗口值大小到对应的
 register中*/
-register register_vcc{
-	width:16;
-	instance_count:128;
-}
+
+//原来register在的位置
+
 /*在egress中设置如果出去的端口值为1，那么将其window设置成为
 其他的2~11端口对应的寄存器的平均值*/
 /********************************************/

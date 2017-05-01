@@ -88,6 +88,13 @@ parser parser_tcp_options{
 		0x000000 mask 0x0000ff : parser_tcp_options_EOL;
 		0x000001 mask 0x0000ff : parser_tcp_options_NOP;
 		0x000002 mask 0x0000ff : parser_tcp_options_MSS;
+		default : parser_tcp_sub_options;
+	}
+}
+
+parser parser_tcp_sub_options{
+	return select(metadata_vcc_tcp_window.tcp_options_len_left,
+		current(0,8)){
 		0x000003 mask 0x0000ff : parser_tcp_options_WINDOW;
 		0x000004 mask 0x0000ff : parser_tcp_options_SACK_PERM;
 		0x000005 mask 0x0000ff : parser_tcp_options_SACK;
@@ -97,10 +104,10 @@ parser parser_tcp_options{
 }
 
 parser parser_tcp_options_EOL{
-	extract(tcp_option_EOL[next]);
+	extract(tcp_option_EOL);
 	set_metadata(metadata_vcc_tcp_window.tcp_options_len_left,
 		metadata_vcc_tcp_window.tcp_options_len_left-1);
-	return parser_tcp_options;
+	return ingress;
 }
 
 parser parser_tcp_options_NOP{
@@ -123,6 +130,7 @@ parser parser_tcp_options_WINDOW{
 		metadata_vcc_tcp_window.tcp_options_len_left-3);
 	return parser_tcp_options;
 }
+
 parser parser_tcp_options_SACK_PERM{
 	extract(tcp_option_SACK_PERM);
 	set_metadata(metadata_vcc_tcp_window.tcp_options_len_left,

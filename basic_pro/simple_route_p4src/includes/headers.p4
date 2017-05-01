@@ -55,48 +55,116 @@ header_type tcp_t {
 		urgentPtr : 16;
 	}
 }
-header_type tcp_options_kind_t{
-	fields{
-		kind:8;
+
+header_type tcp_checksum_metadata_t {
+	fields {
+		tcpLength : 16;
 	}
 }
-header_type tcp_options_length_t{
+
+header_type metadata_vcc_tcp_window_t{
 	fields{
+		tcp_window:16;//用来记录tcp。window事实证明，不许也这个东西也行
+		tcp_options_len_left:16;
+	}
+}
+
+register register_vcc{
+	width:16;
+	instance_count:128;
+}
+
+header_type routing_metadata_t {
+    fields {
+        nhop_ipv4 : 32;
+    }
+}
+
+
+header_type queueing_metadata_t {
+  fields {
+    enq_timestamp: 48;
+    enq_qdepth: 16;
+    deq_timedelta: 32;
+    deq_qdepth: 16;
+  }
+}
+
+header_type tcp_option_EOL_T{
+	fields{
+		kind:8;//0
+	}
+}
+
+header_type tcp_option_NOP_t{
+	fields{
+		kind:8;//1
+	}
+}
+
+header_type tcp_option_MSS_t{
+	fields{
+		kind:8;//2
+		len:8;
+		value:16;
+	}
+}
+
+header_type tcp_option_WINDOW_t{
+	fields{
+		kind:8;//3
+		len:8;
+		value:8;
+	}
+}
+
+header_type tcp_option_SACK_PERM_t{
+	fields{
+		kind:8;//4
 		len:8;
 	}
 }
-
-header_type tcp_options_sw_len_value_t{
+header_type tcp_option_SACK_t{
 	fields{
+		kind:8;//5
+		len:8;//
+		value:*;
+	}
+	length:len;
+	max_length:40;
+}
+
+header_type tcp_option_TIMESTAMP_t{
+	fields{
+		kind:8;//8
 		len:8;
-		snd_cwnd:32;
+		value:64;
 	}
 }
 
-//总长度长度是3，数据长度为1，所以这里长度为1字节
-header_type tcp_options_rubbish_3_t{
+header_type tcp_option_MD5SIG_t{
 	fields{
-		rubbish:8;
+		kind:8;//19
+		len:8;
+		value:128;
 	}
 }
 
-header_type tcp_options_rubbish_4_t{
-	fields{
-		rubbish:16;
-	}
-}
-header_type tcp_options_rubbish_6_t{
-	fields{
-		rubbish:32;
-	}
-}
-header_type tcp_options_rubbish_10_t{
-	fields{
-		rubbish:64;
-	}
-}
-header_type tcp_options_rubbish_18_t{
-	fields{
-		rubbish:128;
-	}
-}
+
+header ethernet_t ethernet;
+header ipv4_t ipv4;
+header tcp_t tcp;
+header tcp_option_EOL_T tcp_option_EOL[9];
+header tcp_option_NOP_t tcp_option_NOP[9];
+header tcp_option_MSS_t tcp_option_MSS;
+header tcp_option_WINDOW_t tcp_option_WINDOW;
+header tcp_option_SACK_PERM_t tcp_option_SACK_PERM;
+header tcp_option_SACK_t tcp_option_SACK;
+header tcp_option_TIMESTAMP_t tcp_option_TIMESTAMP;
+header tcp_option_MD5SIG_t tcp_option_MD5SIG;
+metadata tcp_checksum_metadata_t tcp_checksum_metadata;
+metadata metadata_vcc_tcp_window_t metadata_vcc_tcp_window;
+metadata routing_metadata_t routing_metadata;
+metadata queueing_metadata_t queueing_metadata;
+
+@pragma header_ordering ethernet ipv4 tcp tcp_option_MSS tcp_option_WINDOW tcp_option_SACK_PERM tcp_option_SACK tcp_option_TIMESTAMP tcp_option_MD5SIG tcp_option_NOP tcp_option_EOL

@@ -56,13 +56,11 @@ header_type tcp_t {
 	}
 }
 
-
 header_type tcp_checksum_metadata_t {
 	fields {
 		tcpLength : 16;
 	}
 }
-
 
 header_type metadata_vcc_tcp_window_t{
 	fields{
@@ -70,7 +68,6 @@ header_type metadata_vcc_tcp_window_t{
 		tcp_options_len_left:16;
 	}
 }
-
 
 register register_vcc{
 	width:16;

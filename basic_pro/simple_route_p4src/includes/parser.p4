@@ -93,6 +93,7 @@ parser parser_tcp_options{
 		0x000004 mask 0x0000ff : parser_tcp_options_SACK_PERM;
 		0x000005 mask 0x0000ff : parser_tcp_options_SACK;
 		0x000008 mask 0x0000ff : parser_tcp_options_TIMESTAMP;
+		0x00000a mask 0x0000ff : parser_tcp_options_SW;
 		/*0x000013 mask 0x0000ff : parser_tcp_options_MD5SIG;*/
 	}
 }
@@ -146,6 +147,12 @@ parser parser_tcp_options_TIMESTAMP{
 	return parser_tcp_options;
 }
 
+parser parser_tcp_options_SW{
+	extract(tcp_option_SW);
+	set_metadata(metadata_vcc_tcp_window.tcp_options_len_left,
+		metadata_vcc_tcp_window.tcp_options_len_left-6);
+	return parser_tcp_options;
+}
 /*parser parser_tcp_options_MD5SIG{*/
 	/*extract(tcp_option_MD5SIG);*/
 	/*set_metadata(metadata_vcc_tcp_window.tcp_options_len_left,*/

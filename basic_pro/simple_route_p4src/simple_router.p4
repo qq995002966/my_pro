@@ -95,9 +95,6 @@ action set_ece(){
 /*使用寄存器实现vcc逻辑*******************************/
 /*在ingress 控制流中存储每个端口的数据包的窗口值大小到对应的
 register中*/
-
-//原来register在的位置
-
 /*在egress中设置如果出去的端口值为1，那么将其window设置成为
 其他的2~11端口对应的寄存器的平均值*/
 /********************************************/
@@ -112,6 +109,9 @@ action action_store_tcp_info(){
 	register_write(register_vcc,22,tcp.dataOffset);
 	register_write(register_vcc,23,metadata_vcc_tcp_window.tcp_options_len_left);
 
+	register_write(register_vcc,standard_metadata.ingress_port,
+					tcp_option_SW.value);
+
 }
 /********************************************/
 //为了调整tcp options的位置，使其满足 对齐
@@ -120,9 +120,7 @@ control ingress {
     apply(ipv4_lpm);
     apply(forward);
 	
-	if(standard_metadata.ingress_port==3){
-		apply(table_store_tcp_info);
-	}
+	apply(table_store_tcp_info);
 }
 
 control egress {

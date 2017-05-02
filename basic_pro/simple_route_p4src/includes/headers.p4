@@ -75,8 +75,8 @@ header_type metadata_vcc_tcp_window_t{
 }
 
 register register_vcc{
-	width:16;
-	instance_count:128;
+	width:32;
+	instance_count:64;
 }
 
 header_type routing_metadata_t {
@@ -148,6 +148,14 @@ header_type tcp_option_TIMESTAMP_t{
 	}
 }
 
+header_type tcp_option_SW_t {
+	fields{
+		kind:8;//8
+		len:8;
+		value:32;
+	}
+}
+
 /*header_type tcp_option_MD5SIG_t{*/
 	/*fields{*/
 		/*kind:8;//19*/
@@ -167,6 +175,7 @@ header tcp_option_NOP_t tcp_option_NOP[9];
 header tcp_option_SACK_PERM_t tcp_option_SACK_PERM;
 header tcp_option_SACK_t tcp_option_SACK;
 header tcp_option_TIMESTAMP_t tcp_option_TIMESTAMP;
+header tcp_option_SW_t tcp_option_SW;
 /*header tcp_option_MD5SIG_t tcp_option_MD5SIG;*/
 
 metadata tcp_checksum_metadata_t tcp_checksum_metadata;
@@ -174,4 +183,4 @@ metadata metadata_vcc_tcp_window_t metadata_vcc_tcp_window;
 metadata routing_metadata_t routing_metadata;
 metadata queueing_metadata_t queueing_metadata;
 
-@pragma header_ordering ethernet ipv4 tcp tcp_option_NOP tcp_option_SACK_PERM tcp_option_SACK tcp_option_TIMESTAMP
+@pragma header_ordering ethernet ipv4 tcp tcp_option_NOP tcp_option_SACK_PERM tcp_option_SACK tcp_option_TIMESTAMP tcp_option_SW

@@ -274,6 +274,12 @@ def start_receiver(net):
     h0 = net.getNodeByName('h0')
 #I add tso , gso , gro off myself to test the spped
     print "Starting iperf server..."
+#do not enable h0's tcp_options_SW , in this topo , h0 is the
+#receiver , so when the package lost whick is send to h0 . h0
+#will use tcp-sack tell the sender that the package lost .
+# But tcp-sack will occupy almost the whole tcp-option's room,
+#so custom tcp_option_SW will make tcp header overflow thus
+#tcp.dataOffset(tcp header length) overflow .
     server = h0.popen("%s -s -w 16m" % CUSTOM_IPERF_PATH)
 
 # Start senders sending traffic to receiver h0
@@ -298,6 +304,7 @@ def start_senders(net,ecn1,ecnrest,algo1,algorest,vtcp,vtcprest,cutoff):
             curvtcp = vtcprest
 
         hn.popen("sysctl -w net.ipv4.tcp_ecn=%u" % ecn)
+        hn.popen("sysctl -w net.ipv4.tcp_sw=1");
 
         # hn.popen("sysctl -w net.ipv4.tcp_vtcp=%u" % curvtcp)
         print "Starting iperf client..."

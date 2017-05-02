@@ -75,11 +75,11 @@ parser parser_tcp{
 	set_metadata(metadata_vcc_tcp_window.tcp_window,latest.window);
 	set_metadata(metadata_vcc_tcp_window.tcp_options_len_left,
 						(tcp.dataOffset*4)-20);
-	return ingress;//这里是为了测试 tcp dataOffset字段
-	/*return select(tcp.dataOffset){*/
-		/*0x5 : ingress;		//5代表没有tcp options*/
-		/*default:parser_tcp_options;*/
-	/*}*/
+	/*return ingress;//这里是为了测试 tcp dataOffset字段*/
+	return select(tcp.dataOffset){
+		0x5 : ingress;		//5代表没有tcp options
+		default:parser_tcp_options;
+	}
 }
 parser parser_tcp_options{
 	return select(metadata_vcc_tcp_window.tcp_options_len_left,
@@ -97,7 +97,7 @@ parser parser_tcp_options{
 }
 
 parser parser_tcp_options_EOL{
-	extract(tcp_option_EOL[next]);
+	extract(tcp_option_EOL);
 	set_metadata(metadata_vcc_tcp_window.tcp_options_len_left,
 		metadata_vcc_tcp_window.tcp_options_len_left-1);
 	return parser_tcp_options;

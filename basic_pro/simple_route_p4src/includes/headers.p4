@@ -154,7 +154,7 @@ header_type tcp_option_MD5SIG_t{
 header ethernet_t ethernet;
 header ipv4_t ipv4;
 header tcp_t tcp;
-header tcp_option_EOL_T tcp_option_EOL[9];
+header tcp_option_EOL_T tcp_option_EOL;
 header tcp_option_NOP_t tcp_option_NOP[9];
 header tcp_option_MSS_t tcp_option_MSS;
 header tcp_option_WINDOW_t tcp_option_WINDOW;

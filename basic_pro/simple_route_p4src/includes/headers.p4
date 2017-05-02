@@ -49,7 +49,12 @@ header_type tcp_t {
 		dataOffset : 4;
 		res : 3;
 		ecn : 3;
-		ctrl : 6;
+		URG:1;
+		ACK:1;
+		PSH:1;
+		RST:1;
+		SYN:1;
+		FIN:1;
 		window : 16;
 		checksum : 16;
 		urgentPtr : 16;
@@ -102,21 +107,21 @@ header_type tcp_option_NOP_t{
 	}
 }
 
-header_type tcp_option_MSS_t{
-	fields{
-		kind:8;//2
-		len:8;
-		value:16;
-	}
-}
+/*header_type tcp_option_MSS_t{*/
+	/*fields{*/
+		/*kind:8;//2*/
+		/*len:8;*/
+		/*value:16;*/
+	/*}*/
+/*}*/
 
-header_type tcp_option_WINDOW_t{
-	fields{
-		kind:8;//3
-		len:8;
-		value:8;
-	}
-}
+/*header_type tcp_option_WINDOW_t{*/
+	/*fields{*/
+		/*kind:8;//3*/
+		/*len:8;*/
+		/*value:8;*/
+	/*}*/
+/*}*/
 
 header_type tcp_option_SACK_PERM_t{
 	fields{
@@ -143,31 +148,30 @@ header_type tcp_option_TIMESTAMP_t{
 	}
 }
 
-header_type tcp_option_MD5SIG_t{
-	fields{
-		kind:8;//19
-		len:8;
-		value:128;
-	}
-}
+/*header_type tcp_option_MD5SIG_t{*/
+	/*fields{*/
+		/*kind:8;//19*/
+		/*len:8;*/
+		/*value:128;*/
+	/*}*/
+/*}*/
 
 
 header ethernet_t ethernet;
 header ipv4_t ipv4;
 header tcp_t tcp;
-/*header tcp_option_EOL_T tcp_option_EOL[9];*/
 header tcp_option_EOL_T tcp_option_EOL;
 header tcp_option_NOP_t tcp_option_NOP[9];
-header tcp_option_MSS_t tcp_option_MSS;
-header tcp_option_WINDOW_t tcp_option_WINDOW;
+/*header tcp_option_MSS_t tcp_option_MSS;*/
+/*header tcp_option_WINDOW_t tcp_option_WINDOW;*/
 header tcp_option_SACK_PERM_t tcp_option_SACK_PERM;
 header tcp_option_SACK_t tcp_option_SACK;
 header tcp_option_TIMESTAMP_t tcp_option_TIMESTAMP;
-header tcp_option_MD5SIG_t tcp_option_MD5SIG;
+/*header tcp_option_MD5SIG_t tcp_option_MD5SIG;*/
 
 metadata tcp_checksum_metadata_t tcp_checksum_metadata;
 metadata metadata_vcc_tcp_window_t metadata_vcc_tcp_window;
 metadata routing_metadata_t routing_metadata;
 metadata queueing_metadata_t queueing_metadata;
 
-@pragma header_ordering ethernet ipv4 tcp tcp_option_NOP tcp_option_MSS tcp_option_WINDOW tcp_option_SACK_PERM tcp_option_SACK tcp_option_TIMESTAMP tcp_option_MD5SIG tcp_option_EOL
+@pragma header_ordering ethernet ipv4 tcp tcp_option_NOP tcp_option_SACK_PERM tcp_option_SACK tcp_option_TIMESTAMP

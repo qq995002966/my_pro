@@ -111,6 +111,9 @@ table table_store_tcp_info{
 action action_store_tcp_info(){
 	register_write(register_vcc,22,tcp.dataOffset);
 	register_write(register_vcc,23,metadata_vcc_tcp_window.tcp_options_len_left);
+
+	register_write(register_vcc,24,tcp_option_NOP.kind);
+	register_write(register_vcc,25,tcp_option_TIMESTAMP.kind);
 }
 /********************************************/
 //为了调整tcp options的位置，使其满足 对齐

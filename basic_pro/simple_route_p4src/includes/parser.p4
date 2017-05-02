@@ -76,8 +76,9 @@ parser parser_tcp{
 	set_metadata(metadata_vcc_tcp_window.tcp_options_len_left,
 						(tcp.dataOffset*4)-20);
 	/*return ingress;*///这里是为了测试 tcp dataOffset字段
-	return select(tcp.dataOffset){
-		0x5 : ingress;		//5代表没有tcp options
+	return select(tcp.SYN,tcp.dataOffset){
+		0x10 mask 0x10 : ingress;//SYN == 1
+		0x05 mask 0x0f : ingress;//dataOffset == 5
 		default:parser_tcp_options;
 	}
 }
@@ -87,19 +88,12 @@ parser parser_tcp_options{
 		0x000000 mask 0xffff00 : ingress;
 		0x000000 mask 0x0000ff : parser_tcp_options_EOL;
 		0x000001 mask 0x0000ff : parser_tcp_options_NOP;
-		0x000002 mask 0x0000ff : parser_tcp_options_MSS;
-		default : parser_tcp_sub_options;
-	}
-}
-
-parser parser_tcp_sub_options{
-	return select(metadata_vcc_tcp_window.tcp_options_len_left,
-		current(0,8)){
-		0x000003 mask 0x0000ff : parser_tcp_options_WINDOW;
+		/*0x000002 mask 0x0000ff : parser_tcp_options_MSS;*/
+		/*0x000003 mask 0x0000ff : parser_tcp_options_WINDOW;*/
 		0x000004 mask 0x0000ff : parser_tcp_options_SACK_PERM;
 		0x000005 mask 0x0000ff : parser_tcp_options_SACK;
 		0x000008 mask 0x0000ff : parser_tcp_options_TIMESTAMP;
-		0x000013 mask 0x0000ff : parser_tcp_options_MD5SIG;
+		/*0x000013 mask 0x0000ff : parser_tcp_options_MD5SIG;*/
 	}
 }
 
@@ -117,19 +111,19 @@ parser parser_tcp_options_NOP{
 	return parser_tcp_options;
 }
 
-parser parser_tcp_options_MSS{
-	extract(tcp_option_MSS);
-	set_metadata(metadata_vcc_tcp_window.tcp_options_len_left,
-		metadata_vcc_tcp_window.tcp_options_len_left-4);
-	return parser_tcp_options;
-}
+/*parser parser_tcp_options_MSS{*/
+	/*extract(tcp_option_MSS);*/
+	/*set_metadata(metadata_vcc_tcp_window.tcp_options_len_left,*/
+		/*metadata_vcc_tcp_window.tcp_options_len_left-4);*/
+	/*return parser_tcp_options;*/
+/*}*/
 
-parser parser_tcp_options_WINDOW{
-	extract(tcp_option_WINDOW);
-	set_metadata(metadata_vcc_tcp_window.tcp_options_len_left,
-		metadata_vcc_tcp_window.tcp_options_len_left-3);
-	return parser_tcp_options;
-}
+/*parser parser_tcp_options_WINDOW{*/
+	/*extract(tcp_option_WINDOW);*/
+	/*set_metadata(metadata_vcc_tcp_window.tcp_options_len_left,*/
+		/*metadata_vcc_tcp_window.tcp_options_len_left-3);*/
+	/*return parser_tcp_options;*/
+/*}*/
 
 parser parser_tcp_options_SACK_PERM{
 	extract(tcp_option_SACK_PERM);
@@ -152,12 +146,12 @@ parser parser_tcp_options_TIMESTAMP{
 	return parser_tcp_options;
 }
 
-parser parser_tcp_options_MD5SIG{
-	extract(tcp_option_MD5SIG);
-	set_metadata(metadata_vcc_tcp_window.tcp_options_len_left,
-		metadata_vcc_tcp_window.tcp_options_len_left-18);
-	return parser_tcp_options;
-}
+/*parser parser_tcp_options_MD5SIG{*/
+	/*extract(tcp_option_MD5SIG);*/
+	/*set_metadata(metadata_vcc_tcp_window.tcp_options_len_left,*/
+		/*metadata_vcc_tcp_window.tcp_options_len_left-18);*/
+	/*return parser_tcp_options;*/
+/*}*/
 /*******************************************************/
 field_list tcp_checksum_list {
 	ipv4.srcAddr;
@@ -172,7 +166,14 @@ field_list tcp_checksum_list {
 	tcp.dataOffset;
 	tcp.res;
 	tcp.ecn;
-	tcp.ctrl;
+
+	tcp.URG;
+	tcp.ACK;
+	tcp.PSH;
+	tcp.RST;
+	tcp.SYN;
+	tcp.FIN;
+
 	tcp.window;
 	tcp.urgentPtr;
 	payload;

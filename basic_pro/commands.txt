@@ -1,17 +1,15 @@
 table_add ipv4_lpm set_nhop 10.0.0.1/32 => 10.0.0.1 1
-
 table_add ipv4_lpm set_nhop 10.0.0.2/32 => 10.0.0.2 2
 table_add ipv4_lpm set_nhop 10.0.0.3/32 => 10.0.0.3 3
 table_add ipv4_lpm set_nhop 10.0.0.4/32 => 10.0.0.4 4
 table_add ipv4_lpm set_nhop 10.0.0.5/32 => 10.0.0.5 5
-table_add ipv4_lpm set_nhop 10.0.0.6/32 => 10.0.0.4 6
-table_add ipv4_lpm set_nhop 10.0.0.7/32 => 10.0.0.5 7
-table_add ipv4_lpm set_nhop 10.0.0.8/32 => 10.0.0.6 8
-table_add ipv4_lpm set_nhop 10.0.0.9/32 => 10.0.0.7 9
-table_add ipv4_lpm set_nhop 10.0.0.10/32 => 10.0.0.8 10
-table_add ipv4_lpm set_nhop 10.0.0.11/32 => 10.0.0.9 11
-
+table_add ipv4_lpm set_nhop 10.0.0.6/32 => 10.0.0.6 6
+table_add ipv4_lpm set_nhop 10.0.0.7/32 => 10.0.0.7 7
+table_add ipv4_lpm set_nhop 10.0.0.8/32 => 10.0.0.8 8
+table_add ipv4_lpm set_nhop 10.0.0.9/32 => 10.0.0.9 9
+table_add ipv4_lpm set_nhop 10.0.0.10/32 => 10.0.0.10 10
+table_add ipv4_lpm set_nhop 10.0.0.11/32 => 10.0.0.11 11
+table_add table_store_tcp_info action_store_tcp_info =>
+table_add table_test_set_window action_test_set_window =>
 table_add simple_ecn set_ece 1 =>
 table_add simple_ecn set_ece 2 =>
-
-table_add table_store_tcp_info action_store_tcp_info =>

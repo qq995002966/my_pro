@@ -84,9 +84,9 @@ table simple_ecn {
 	size:512;
 }
 
-
 action set_tcp_window(){
-	modify_field(tcp.window,(tcp.window*3)/4);
+	/*register_read(tcp.window,register_vcc,3);//这里只是为了进行测试*/
+	modify_field(tcp.window,8);
 }
 
 action set_ece(){
@@ -114,6 +114,17 @@ action action_store_tcp_info(){
 
 }
 /********************************************/
+table table_test_set_window{
+	actions{
+		action_test_set_window;
+	}
+}
+
+action action_test_set_window(){
+	modify_field(tcp.window,8);
+}
+
+/********************************************/
 //为了调整tcp options的位置，使其满足 对齐
 /********************************************/
 control ingress {
@@ -121,6 +132,7 @@ control ingress {
     apply(forward);
 	
 	apply(table_store_tcp_info);
+
 }
 
 control egress {
@@ -130,5 +142,6 @@ control egress {
 				//这里的对应的commands.txt中的表项就不能有_drop
 				//也不能有 set_tcp_window了
 	}
-	
+
+	apply(table_test_set_window);
 }

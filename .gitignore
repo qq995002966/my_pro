@@ -10,6 +10,7 @@ basic_pro/simple_router.json
 basic_pro/tcpfair
 basic_pro/tcpfair_backup
 basic_pro/compile_p4src.sh
+basic_pro/tcpfair.tar
 
 
 vcc-exp

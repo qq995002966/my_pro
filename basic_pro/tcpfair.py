@@ -272,7 +272,7 @@ def set_receiver_arp(net):
 
 def start_receiver(net):
     h0 = net.getNodeByName('h0')
-#I add tso , gso , gro off myself to test the spped
+#I add tso , gso , gro off myself to test the speed
     print "Starting iperf server..."
 #do not enable h0's tcp_options_SW , in this topo , h0 is the
 #receiver , so when the package lost whick is send to h0 . h0
@@ -290,6 +290,7 @@ def set_senders_arp(net):
         print "Set sender defaut route and arp"
         hn.setDefaultRoute("dev eth0")
         hn.setARP("10.0.0.1","00:04:00:00:0:01")
+
 def start_senders(net,ecn1,ecnrest,algo1,algorest,vtcp,vtcprest,cutoff):
     h0 = net.getNodeByName('h0')
     for i in range(args.hosts-1):

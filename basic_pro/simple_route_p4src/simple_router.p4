@@ -103,6 +103,7 @@ table table_store_tcp_info{
 	actions{
 		action_store_tcp_info;
 	}
+	size:8;
 }
 
 action action_store_tcp_info(){
@@ -115,13 +116,17 @@ action action_store_tcp_info(){
 }
 /********************************************/
 table table_test_set_window{
+	reads{
+		standard_metadata.egress_spec:exact;
+	}
 	actions{
 		action_test_set_window;
 	}
+	size:64;
 }
 
-action action_test_set_window(){
-	modify_field(tcp.window,8);
+action action_test_set_window(window_value){
+	modify_field(tcp.window,window_value);
 }
 
 /********************************************/
@@ -137,11 +142,11 @@ control ingress {
 
 control egress {
     apply(send_frame);
-	if(queueing_metadata.enq_qdepth>=3){
-		apply(simple_ecn);//如果用register实现vcc的话，
-				//这里的对应的commands.txt中的表项就不能有_drop
-				//也不能有 set_tcp_window了
-	}
+	/*if(queueing_metadata.enq_qdepth>=3){*/
+		/*apply(simple_ecn);//如果用register实现vcc的话，*/
+				/*//这里的对应的commands.txt中的表项就不能有_drop*/
+				/*//也不能有 set_tcp_window了*/
+	/*}*/
 
 	apply(table_test_set_window);
 }

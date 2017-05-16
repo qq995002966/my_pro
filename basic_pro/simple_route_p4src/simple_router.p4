@@ -78,15 +78,9 @@ table simple_ecn {
 	}
 	actions{
 		set_ece;
-		set_tcp_window;
 		_drop;
 	}
 	size:512;
-}
-
-action set_tcp_window(){
-	/*register_read(tcp.window,register_vcc,3);//这里只是为了进行测试*/
-	modify_field(tcp.window,8);
 }
 
 action set_ece(){
@@ -99,21 +93,21 @@ register中*/
 其他的2~11端口对应的寄存器的平均值*/
 /********************************************/
 // TCP OPTIONS
-table table_store_tcp_info{
-	actions{
-		action_store_tcp_info;
+table table_store_tcp_scale{
+	reads{
+		tcp_option_WINDOW:valid;
 	}
-	size:8;
+	actions{
+		action_store_tcp_scale;
+	}
+	size:32;
 }
 
-action action_store_tcp_info(){
-	register_write(register_vcc,22,tcp.dataOffset);
-	register_write(register_vcc,23,metadata_vcc_tcp_window.tcp_options_len_left);
-
-	register_write(register_vcc,standard_metadata.ingress_port,
-					tcp_option_SW.value);
-
+action action_store_tcp_scale(){
+	register_write(register_vcc,standard_metadata.ingress_port+30,
+					tcp_option_WINDOW.value);
 }
+
 /********************************************/
 table table_test_set_window{
 	reads{
@@ -128,7 +122,31 @@ table table_test_set_window{
 action action_test_set_window(window_value){
 	modify_field(tcp.window,window_value);
 }
+/********************************************/
+table table_store_tcp_mss{
+	reads{
+		tcp_option_MSS:valid;
+	}
+	actions{
+		action_store_tcp_mss;
+	}
+}
 
+action action_store_tcp_mss(){
+	register_write(register_vcc,standard_metadata.ingress_port+50,
+				tcp_option_MSS.value);
+}
+
+/********************************************/
+table table_store_tcp_sw{
+	actions{
+		action_store_tcp_sw;
+	}
+}
+action action_store_tcp_sw(){
+	register_write(register_vcc,standard_metadata.ingress_port,
+					tcp_option_SW.value);
+}
 /********************************************/
 //为了调整tcp options的位置，使其满足 对齐
 /********************************************/
@@ -136,8 +154,11 @@ control ingress {
     apply(ipv4_lpm);
     apply(forward);
 	
-	apply(table_store_tcp_info);
+	apply(table_store_tcp_sw);
+	apply(table_store_tcp_scale);
+	apply(table_store_tcp_mss);
 
+	apply(table_test_set_window);
 }
 
 control egress {
@@ -148,5 +169,4 @@ control egress {
 				/*//也不能有 set_tcp_window了*/
 	/*}*/
 
-	apply(table_test_set_window);
 }

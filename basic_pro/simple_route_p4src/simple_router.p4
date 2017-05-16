@@ -119,8 +119,9 @@ table table_test_set_window{
 	size:64;
 }
 
-action action_test_set_window(window_value){
-	modify_field(tcp.window,window_value);
+action action_test_set_window(ingress_port){
+	register_read(register_store_metadata.value,register_vcc,ingress_port);
+	modify_field(tcp.window,register_store_metadata.value*4);
 }
 /********************************************/
 table table_store_tcp_mss{

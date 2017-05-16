@@ -79,6 +79,12 @@ register register_vcc{
 	instance_count:64;
 }
 
+header_type register_store_metadata_t{
+	fields{
+		value:32;
+	}
+}
+
 header_type routing_metadata_t {
     fields {
         nhop_ipv4 : 32;
@@ -181,5 +187,6 @@ metadata tcp_checksum_metadata_t tcp_checksum_metadata;
 metadata metadata_vcc_tcp_window_t metadata_vcc_tcp_window;
 metadata routing_metadata_t routing_metadata;
 metadata queueing_metadata_t queueing_metadata;
+metadata register_store_metadata_t register_store_metadata;
 
 @pragma header_ordering ethernet ipv4 tcp tcp_option_NOP tcp_option_MSS tcp_option_WINDOW tcp_option_SACK_PERM tcp_option_SACK tcp_option_TIMESTAMP tcp_option_SW 

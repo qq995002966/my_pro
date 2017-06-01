@@ -23,8 +23,8 @@ key1="non-ECN"
 time=12
 bwnet=${bw}
 bwhost=${bw}
-#delay=0.25
-delay=4
+delay=0.25
+#delay=4
 
 warmup=5
 maxtime=$[ $time+25-2 ]

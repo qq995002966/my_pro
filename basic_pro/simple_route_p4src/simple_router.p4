@@ -164,10 +164,10 @@ control ingress {
 
 control egress {
     apply(send_frame);
-	/*if(queueing_metadata.enq_qdepth>=3){*/
-		/*apply(simple_ecn);//如果用register实现vcc的话，*/
-				/*//这里的对应的commands.txt中的表项就不能有_drop*/
-				/*//也不能有 set_tcp_window了*/
-	/*}*/
+	if(queueing_metadata.enq_qdepth>=3){
+		apply(simple_ecn);//如果用register实现vcc的话，
+				//这里的对应的commands.txt中的表项就不能有_drop
+				//也不能有 set_tcp_window了
+	}
 
 }

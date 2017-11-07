@@ -34,7 +34,7 @@ iperf_port=5001
 iperf=`which iperf`
 qsize=1000
 #for cutoff in `seq 1 4 10`; do
-for cutoff in `seq 1`; do
+for cutoff in  5; do
     dir="tcpfair/${label}-c${cutoff}"
     rm -rf $dir
     mkdir -p $dir

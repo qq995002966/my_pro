@@ -22,7 +22,7 @@ if [ ! -d "$figdir" ]; then
 fi
 
 label="10s"
-bw=200
+bw=300
 ./tcp_fair_RED.sh  ${bw}  ${label}  RED1tab
 
 
